@@ -1,0 +1,475 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Дилер заказ</title>
+  <link rel="shortcut icon" href="{% static 'assets/todotodo_logo.png' %}" type="image/x-icon" />
+  <link rel="stylesheet" href="{% static 'layout.css' %}" />
+</head>
+
+<body>
+  <div class="layout">
+    <aside>
+      <div class="hamb" id="hamb">
+        <div class="hamb__field" id="hamb">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+      </div>
+      <div class="top">
+        <ul class="menu" id="menu">
+          <li onclick="checkProfile()">
+            Создать заказ</li>
+          <li onclick="
+                document.getElementById('modal').style.display = 'flex';
+                document.getElementById('profile').style.display = 'flex';
+              ">
+            Мой профиль
+          </li>
+          <li style="white-space: nowrap;"><a href="{% url 'diler_orders' %}">Мои заказы</a></li>
+          <li style="white-space: nowrap;"><a href="{% url 'diler_work' %}">Заказы в работе</a></li>
+          <li><a href="{% url 'diler_archive' %}">Архив</a></li>
+          <li><a href="https://t.me/chattodotodo_bot?start=IGS-6Nn-twD17M6tfFgpg">Помощь</a></li>
+          <li><a href="{% url 'logout_core_view' %}">Выход</a></li>
+        </ul>
+      </div>
+    </aside>
+    <div class="popup" id="popup"></div>
+    <div class="view">
+      <div class="content">
+        <h1 class="title">Инфо о заказе</h1>
+        {% if order.type_delivery == '0' %}
+        <h3 style="white-space: nowrap;" class="title">Адрес: {{ order.address }}</h3>
+        {% elif order.type_delivery == '1' %}
+        <h3 style="white-space: nowrap;" class="title">Адрес: {{ order.user.warehouse_address }}</h3>
+        {% else %}
+        <h3 style="white-space: nowrap;" class="title">Адрес: Самовывоз</h3>
+        {% endif %}
+
+        <table class="table or" cellspacing="0" cellpadding="0">
+          <thead>
+            <tr>
+              <th>Профиль</th>
+              <th>Фурнитура</th>
+              <th>Желаемая цена</th>
+              <th>Вид оплаты</th>
+              <th>Вид доставки</th>
+              <th>Замерник</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ order.shape.data }}</td>
+              <td>{{ order.implement.data }}</td>
+              <td>{{ order.price }}</td>
+              {% if order.type_pay == 'C' %}
+              <td>Карта</td>
+              {% else %}
+              <td>Безнал</td>
+              {% endif %}
+
+              {% if order.type_delivery == '0' %}
+              <td>Адрес клиента</td>
+              {% elif order.type_delivery == '1' %}
+              <td>Мой склад</td>
+              {% else %}
+              <td>Самовывоз</td>
+              {% endif %}
+              <td><a href="{{ order.file.url }}" style="text-decoration: none;">{{ order.filename }}</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="comment_field" style="align-items: center">
+          <div class="flex_row_gap">
+            <p>Комментарий</p>
+            <div>{{ order.comment }}</div>
+          </div>
+        </div>
+        <table class="table kp" cellspacing="0" cellpadding="0">
+          <thead>
+            <tr>
+              <th style="background-color: #35a576;">Дата</th>
+              <th style="background-color: #016e41;">Поставщик</th>
+              <th style="background-color: #35a576;">Профиль</th>
+              <th style="background-color: #016e41;">Фурнитура</th>
+              <th style="background-color: #35a576;">Стоимость</th>
+              <th style="background-color: #016e41;">Поставка</th>
+              <th style="background-color: #35a576;">Коммерческое предложение</th>
+              <th style="background-color: #016e41;">Статус</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for quantity in order.quantity_set.all %}
+            <tr>
+              <td>{{ quantity.date_create|date:'d.m.Y' }}</td>
+              <td><a href="{% url 'company_card' quantity.author.id %}" style="text-decoration: none;">{{ quantity.author.company }}</a></td>
+              <td>{{ quantity.shape.data }}</td>
+              <td>{{ quantity.implement.data }}</td>
+              <td>{{ quantity.price }}</td>
+              <td>{{ quantity.date|date:'d.m.Y' }}</td>
+              <td><a href="{{ quantity.file.url }}" style="text-decoration: none;">{{ quantity.filename }}</a></td>
+              <td>
+                {% if quantity.isresponse %}
+                <a class="tag" href="">заказано</a>
+                {% else %}
+                <a class="tag active" href="{% url 'diler_response' quantity.id %}" style="text-decoration: none;">заказать</a>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal_background" style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        min-width: 100vw;
+        min-height: 100vh;
+        max-width: 100%;
+        background-color: black;
+        opacity: 0.5;
+        /* z-index: 20; */
+      "></div>
+
+  <div class="modal" id="modal">
+    <form class="window" id="profile" method="post" action="{% url 'dil_save' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <span onclick="
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('profile').style.display = 'none';
+          " class="close_button">&times;</span>
+      <div class="profile_picture flex_center">
+        <div class="branding">
+          <label class="logo" id="logo_preview" for="logo_upload" {% if profile.diler.logo %} style="background: url('{{ profile.diler.logo.url }}') 0 0/100% 100% no-repeat; border-radius: 50%;" {% else %} style="border-radius: 50%;" {% endif %}>
+            {% if profile.diler.logo %}
+            {% else %}
+            <p>Ваше лого</p>
+            {% endif %}
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            name="logo"
+            id="logo_upload"
+            style="display: none"
+          />
+        </div>
+      </div>
+      <h4 style="text-align: center; color: white">Ваш опыт: {{ profile.diler.practice }}</h4>
+      <div class="inputs_with_label">
+        <div>
+          <p>Название компании</p>
+          <input type="text" value="{{ profile.diler.organization }}" maxlength="100" name="company" />
+        </div>
+        <div>
+          <p>Имя и фамилия</p>
+          <input type="text" value="{{ profile.fio }}" maxlength="100" name="fio" />
+        </div>
+        <div>
+          <p>Контактный телефон</p>
+          <input type="text" value="{{ profile.phone_number }}" maxlength="20" name="phone" />
+        </div>
+        <div>
+          <p>Контактный e-mail</p>
+          <input type="text" value="{{ profile.email }}" maxlength="100" name="email" />
+        </div>
+        <div>
+          <p>Адрес склада</p>
+          <input type="text" value="{{ profile.diler.warehouse_address }}"  maxlength="50" name="warehouse_address" />
+        </div>
+        <div>
+          <p>Мой регион</p>
+          <select name="region" class="sel" style="width: 100%;
+              padding: 0.6em 1em;
+              border: none;
+              border-radius: 1em;">
+            <option value="" disabled {% if profile.diler.region == null %} selected {% endif %}>Мой регион</option>
+            {% for region in regions %}
+              <option value="{{ region.id }}" {% if region.data == profile.diler.region.data %} selected {% endif %}>{{ region.data }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <br>
+        <div style="display: flex;">
+          <input type="checkbox" name="submitemail" id="" {% if profile.diler.isEmailsubmit %} checked {% endif %}/>
+          <a style="padding-left: 5px; color: white;">Подписка на рассылку</a>
+        </div>
+      </div>
+      <br>
+      <div class="flex_center">
+        <button id="send_profile" type="button">Подтвердить</button>
+      </div>
+    </form>
+    <form class="window" id="new_order" method="post" enctype="multipart/form-data" action="{% url 'order_save' %}">
+      {% csrf_token %}
+      <span onclick="
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('new_order').style.display = 'none';
+          " class="close_button">&times;</span>
+      <h4 style="text-align: center; color: white">Создание заказа</h4>
+      <div class="inputs_with_label">
+        <div>
+          <p>Выберите профиль</p>
+          <select name="shape" class="sel" style="width: 100%;
+              padding: 0.6em 1em;
+              border: none;
+              border-radius: 1em;">
+            <option value="" disabled selected>Выберите профиль</option>
+            {% for shape in shapes %}
+              <option value="{{ shape.id }}">{{ shape.data }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <p>Выберите фурнитуру</p>
+          <select name="implement" class="sel" style="width: 100%;
+              padding: 0.6em 1em;
+              border: none;
+              border-radius: 1em;">
+            <option value="" disabled selected>Выберите фурнитуру</option>
+            {% for implement in implements %}
+              <option value="{{ implement.id }}">{{ implement.data }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <p>Введите адрес доставки</p>
+          <input type="text" maxlength="50" name="address"/>
+        </div>
+        <div>
+          <p>Выберите вид оплаты</p>
+          <select name="type_pay" class="sel" style="width: 100%;
+              padding: 0.6em 1em;
+              border: none;
+              border-radius: 1em;">
+            <option value="" disabled selected>Вид оплаты</option>
+            <option value="C">Карта</option>
+            <option value="N">Безнал</option>
+          </select>
+        </div>
+        <div>
+          <p>Вид доставки</p>
+          <select name="type_delivery" class="sel" style="width: 100%;
+              padding: 0.6em 1em;
+              border: none;
+              border-radius: 1em;">
+            <option value="" disabled selected>Выберите вид доставки</option>
+            <option value="0">Адрес клиента</option>
+            <option value="1">Мой склад</option>
+            <option value="2">Самовывоз</option>
+          </select>
+        </div>
+        <div class="row">
+          <p>Количество окон</p>
+          <input type="number" placeholder="0" name="amount"/>
+        </div>
+        <div class="row">
+          <p>Желаемая цена</p>
+          <input type="number" placeholder="0,00" name="price"/>
+        </div>
+        <div>
+          <p>Коментарий к заказу</p>
+          <textarea name="comment" id="" cols="30" rows="10"></textarea>
+        </div>
+        <div class="input-file-row">
+          <label class="input-file">
+               <input type="file" name="upl" multiple accept="">		
+               <span>Выберите файл</span>
+           </label>
+          <div class="input-file-list"></div>  
+        </div>
+      </div>
+      <div class="flex_center">
+        <button class="ord_send" type="button">Подтвердить</button>
+      </div>
+    </form>
+  </div>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>
+    var dt = new DataTransfer();
+
+    $('.input-file input[type=file]').on('change', function () {
+      let $files_list = $(this).closest('.input-file').next();
+
+      for (var i = 0; i < this.files.length; i++) {
+        let file = this.files.item(i);
+        dt.items.add(file);
+
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = function () {
+          const file_ex = file.name.split('.').slice(-1)
+          let new_file_input = ''
+          if (file_ex[0] == 'pdf') {
+            new_file_input = '<div class="input-file-list-item">' +
+              '<img class="input-file-list-img" src="{% static 'assets / pdf.svg' %}">' +
+                '<span class="input-file-list-name">' + file.name + '</span>' +
+                '<a href="#" onclick="removeFilesItem(this); return false;" class="input-file-list-remove">x</a>' +
+                '</div>';
+          } else if (file_ex[0] == 'docx') {
+            new_file_input = '<div class="input-file-list-item">' +
+              '<img class="input-file-list-img" src="{% static 'assets / doc.svg' %}">' +
+                '<span class="input-file-list-name">' + file.name + '</span>' +
+                '<a href="#" onclick="removeFilesItem(this); return false;" class="input-file-list-remove">x</a>' +
+                '</div>';
+          } else if (file_ex[0] == 'xlsx') {
+            new_file_input = '<div class="input-file-list-item">' +
+              '<img class="input-file-list-img" src="{% static 'assets / xlsx.svg' %}">' +
+                '<span class="input-file-list-name">' + file.name + '</span>' +
+                '<a href="#" onclick="removeFilesItem(this); return false;" class="input-file-list-remove">x</a>' +
+                '</div>';
+          } else if (file_ex[0] == 'txt') {
+            new_file_input = '<div class="input-file-list-item">' +
+              '<img class="input-file-list-img" src="{% static 'assets / txt.svg' %}">' +
+                '<span class="input-file-list-name">' + file.name + '</span>' +
+                '<a href="#" onclick="removeFilesItem(this); return false;" class="input-file-list-remove">x</a>' +
+                '</div>';
+          } else {
+            new_file_input = '<div class="input-file-list-item">' +
+              '<img class="input-file-list-img" src="' + reader.result + '">' +
+              '<span class="input-file-list-name">' + file.name + '</span>' +
+              '<a href="#" onclick="removeFilesItem(this); return false;" class="input-file-list-remove">x</a>' +
+              '</div>';
+          }
+          $files_list.append(new_file_input);
+        }
+      };
+      this.files = dt.files;
+    });
+
+    function removeFilesItem(target) {
+      let name = $(target).prev().text();
+      let input = $(target).closest('.input-file-row').find('input[type=file]');
+      $(target).closest('.input-file-list-item').remove();
+      for (let i = 0; i < dt.items.length; i++) {
+        if (name === dt.items[i].getAsFile().name) {
+          dt.items.remove(i);
+        }
+      }
+      input[0].files = dt.files;
+    }
+
+
+
+
+
+
+    const ord_send = document.querySelector('.ord_send')
+    ord_send.addEventListener('click', function () {
+      let shape = document.querySelector('select[name$="shape"]');
+      let implement = document.querySelector('select[name$="implement"]');
+      let address = document.querySelector('input[name$="address"]');
+      let type_pay = document.querySelector('select[name$="type_pay"]');
+      let type_delivery = document.querySelector('select[name$="type_delivery"]');
+      let amount = document.querySelector('input[name$="amount"]');
+      let price = document.querySelector('input[name$="price"]');
+      let upl = document.querySelector('input[name$="upl"]');
+
+      if (shape.value == '' || implement.value == '' || address.value == '' || type_pay.value == '' || type_delivery.value == '' || amount.value == '' || price.value == '' || upl.value == '') {
+        alert('Заполните все поля')
+      } else {
+        if (upl.files.length > 10) {
+          alert('Вы можете загрузить не больше 10 файлов')
+        } else {
+          document.querySelector('#new_order').submit();
+        }
+
+      }
+
+    })
+
+    function checkProfile() {
+      let data = {};
+      data = JSON.stringify(data);
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/diler/check");
+      xhr.responseType = 'json';
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.send(data);
+      xhr.onload = () => {
+        if (xhr.status == 200) {
+          if (xhr.response['res']) {
+            document.getElementById('modal').style.display = 'flex';
+            document.getElementById('new_order').style.display = 'flex';
+          } else {
+            alert('Заполните профиль')
+          }
+        }
+      }
+    }
+
+    const send_profile = document.querySelector('#send_profile')
+    send_profile.addEventListener('click', function () {
+      let company = document.querySelector('input[name$="company"]');
+      let fio = document.querySelector('input[name$="fio"]');
+      let phone = document.querySelector('input[name$="phone"]');
+      let email = document.querySelector('input[name$="email"]');
+      let address = document.querySelector('input[name$="warehouse_address"]');
+      let region = document.querySelector('select[name$="region"]');
+      if (company.value == '' || fio.value == '' || phone.value == '' || email.value == '' || address.value == '' || region.value == '') {
+        alert('Заполните все поля')
+      }
+      else {
+        f = document.querySelector('#profile')
+        f.submit()
+      }
+    })
+
+    const logoInput = document.getElementById("logo_upload");
+    const logoPreview = document.getElementById("logo_preview");
+    logoInput.onchange = (e) => {
+      const [file] = logoInput.files;
+      if (file) {
+        logoPreview.style.background =
+          "url(" + URL.createObjectURL(file) + ") 0 0/100% 100% no-repeat";
+        logoPreview.innerHTML = "";
+      }
+    };
+
+
+    const hamb = document.querySelector("#hamb");
+    const popup = document.querySelector("#popup");
+    const body = document.body;
+
+    const menu = document.querySelector("#menu").cloneNode(1);
+
+    hamb.addEventListener("click", hambHandler);
+
+    function hambHandler(e) {
+      e.preventDefault();
+      popup.classList.toggle("open");
+      hamb.classList.toggle("active");
+      body.classList.toggle("noscroll");
+      renderPopup();
+    }
+
+    function renderPopup() {
+      popup.appendChild(menu);
+    }
+
+    const links = Array.from(menu.children);
+
+    links.forEach((link) => {
+      link.addEventListener("click", closeOnClick);
+    });
+
+    function closeOnClick() {
+      popup.classList.remove("open");
+      hamb.classList.remove("active");
+      body.classList.remove("noscroll");
+    }
+  </script>
+</body>
+
+</html>

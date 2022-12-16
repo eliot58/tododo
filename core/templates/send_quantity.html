@@ -1,0 +1,274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Поставщик отправлено КП</title>
+    <link
+      rel="shortcut icon"
+      href="{% static 'assets/todotodo_logo.png' %}"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="{% static 'quantity.css' %}" />
+    <link rel="stylesheet" href="{% static 'multiselect.css' %}">
+  </head>
+  <body>
+    <div class="layout dealer">
+      <aside>
+        <div class="hamb" id="hamb">
+          <div class="hamb__field" id="hamb">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </div>
+        </div>
+        <div class="top">
+          <ul class="menu" id="menu">
+            <li onclick="
+                    document.getElementById('modal').style.display = 'flex';
+                    document.getElementById('profile').style.display = 'flex';
+                  ">
+            Профиль компании
+          </li>
+            <li><a href="{% url 'provider_orders' %}" style="background-color: #090696;">Заказы в регионе</a></li>
+            <li><a href="{% url 'provider_balance' %}" style="background-color: #090696;">Баланс</a></li>
+            <li><a href="{% url 'provider_quantity' %}" style="background-color: #090696;">Отправлено КП</a></li>
+            <li><a href="{% url 'provider_work' %}" style="background-color: #090696;">В работе</a></li>
+            <li><a href="{% url 'provider_archive' %}" style="background-color: #090696;">Архив</a></li>
+            <li><a href="" style="background-color: #090696;">Реклама</a></li>
+            <li><a href="https://t.me/chattodotodo_bot?start=IGS-6Nn-twD17M6tfFgpg" style="background-color: #090696;">Помощь</a></li>
+            <li><a href="{% url 'logout_core_view' %}" style="background-color: #090696;">Выход</a></li>
+          </ul>
+        </div>
+      </aside>
+      <div class="popup" id="popup" style="background-color: #090696;"></div>
+      <div class="view">
+        <div class="content">
+          <div class="split">
+            <div>
+              <h3 class="title" style="white-space: nowrap;">Мои КП</h3>
+              <table class="table" cellspacing="0" cellpadding="0">
+                <thead>
+                  <tr>
+                    <th style="background-color: #090696;">Дата</th>
+                    <th style="white-space: nowrap; background-color: #403ec2;">Кол-во окон</th>
+                    <th style="background-color: #090696;">Профиль</th>
+                    <th style="background-color: #403ec2;">Фурнитура</th>
+                    <th style="background-color: #090696;">Оплата</th>
+                    <th style="background-color: #403ec2;">Доставка</th>
+                    <th style="white-space: nowrap; background-color: #090696;">Желаемая цена</th>
+                    <th style="background-color: #4e4e81;">Профиль</th>
+                    <th style="background-color: #363663;">Фурнитура</th>
+                    <th style="background-color: #4e4e81;">Стоимость</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {% for quantity in profile.provider.quantity_set.all %}
+                {% if quantity.order.isactive %}
+                  <tr>
+                    <td style="white-space: nowrap;">{{ quantity.order.date|date:'d.m.Y' }}</td>
+                    <td style="white-space: nowrap;">{{ quantity.order.amount_window }}</td>
+                    <td style="white-space: nowrap;">{{ quantity.order.shape.data }}</td>
+                    <td style="white-space: nowrap;">{{ quantity.order.implement.data }}</td>
+                    {% if quantity.order.type_pay == 'C' %}
+                        <td style="white-space: nowrap;">Карта</td>
+                        {% else %}
+                        <td style="white-space: nowrap;">Безнал</td>
+                        {% endif %}
+
+                        {% if quantity.order.type_delivery == '0' %}
+                        <td style="white-space: nowrap;">Адрес клиента</td>
+                        {% elif quantity.order.type_delivery == '1' %}
+                        <td style="white-space: nowrap;">Мой склад</td>
+                        {% else %}
+                        <td style="white-space: nowrap;">Самовывоз</td>
+                        {% endif %}
+                    <td style="white-space: nowrap;">{{ quantity.order.price }}</td>
+                    <td style="white-space: nowrap;">{{ quantity.shape.data }}</td>
+                    <td style="white-space: nowrap;">{{ quantity.implement.data }}</td>
+                    <td style="white-space: nowrap;">{{ quantity.price }}</td>
+                  </tr>
+                  {% endif %}
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="modal">
+      <form class="window" id="profile" method="post" action="{% url 'provider_profile' %}" enctype="multipart/form-data" style="background-color: #090696;">
+        {% csrf_token %}
+        <span onclick="
+              document.getElementById('modal').style.display = 'none';
+              document.getElementById('profile').style.display = 'none';
+            " class="close_button">&times;</span>
+        <div class="profile_picture flex_center">
+          <div class="branding">
+            <label class="logo" id="logo_preview" for="logo_upload" {% if profile.provider.logo %} style="background: url('{{ profile.provider.logo.url }}') 0 0/100% 100% no-repeat; border-radius: 50%;" {% else %} style="border-radius: 50%;" {% endif %}>
+              {% if profile.provider.logo %}
+              {% else %}
+              <p>Ваше лого</p>
+              {% endif %}
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              name="logo"
+              id="logo_upload"
+              style="display: none"
+            />
+          </div>
+        </div>
+        <div class="inputs_with_label">
+          <div>
+            <p>Название компании</p>
+            <input type="text" value="{{ profile.provider.company }}" name="company"/>
+          </div>
+          <div>
+            <p>Юридическое лицо</p>
+            <input type="text" value="{{ profile.provider.legal_entity }}" name="legal_entity"/>
+          </div>
+          <div>
+            <p>Адрес производства</p>
+            <input type="text" value="{{ profile.provider.product_address }}" name="product_address"/>
+          </div>
+          <div>
+            <p>Руководитель</p>
+            <input type="text" value="{{ profile.provider.contact_entity }}" name="contact_entity"/>
+          </div>
+          <div>
+            <p>Телефон производства</p>
+            <input type="text" value="{{ profile.provider.contact_phone }}" name="contact_phone"/>
+          </div>
+          <div>
+            <p>Менеджер</p>
+            <input type="text" value="{{ profile.provider.service_entity }}" name="service_entity"/>
+          </div>
+          <div>
+            <p>Контактный телефон</p>
+            <input type="text" value="{{ profile.provider.service_phone }}" name="service_phone"/>
+          </div>
+          <div>
+            <p>E-mail</p>
+            <input type="text" value="{{ profile.provider.service_email }}" name="service_email"/>
+          </div>
+          <div>
+            <p>Профили</p>
+            <select multiple="multiple" style="width: 100%;" name="shapes">
+              {% for shape in shapes %}
+                  <option value="{{ shape.id }}" {% if shape in profile.provider.shapes.all %} selected {% endif %}>{{ shape.data }}</option>
+                {% endfor %}
+            </select>
+          </div>
+          <div>
+            <p>Фурнитура</p>
+            <select multiple="multiple" style="width: 100%;" name="implements">
+              {% for implement in implements %}
+                  <option value="{{ implement.id }}" {% if implement in profile.provider.implements.all %} selected {% endif %}>{{ implement.data }}</option>
+                {% endfor %}
+            </select>
+          </div>
+          <div>
+            <p>Области доставки</p>
+            <select multiple="multiple" style="width: 100%;" name="regions">
+              {% for region in regions %}
+                  <option value="{{ region.id }}" {% if region in profile.provider.regions.all %} selected {% endif %}>{{ region.data }}</option>
+                {% endfor %}
+            </select>
+          </div>
+          <br>
+          <div style="display: flex;">
+            <input type="checkbox" name="submitemail" id="" {% if profile.provider.isEmailsubmit %} checked {% endif %}/>
+            <a style="padding-left: 5px; color: white;">Подписка на рассылку</a>
+          </div>
+          <br>
+          <textarea
+                  class="brand_description smaller"
+                  name="description"
+                  placeholder="О компании"
+                  id=""
+                  rows="10"
+                >{{ profile.provider.description }}</textarea>
+        </div>
+        <div class="flex_center">
+          <button id="send_profile" style="background-color: #07995c;" type="button">Подтвердить</button>
+        </div>
+      </form>
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+      <script src="https://unpkg.com/multiple-select@1.5.2/dist/multiple-select.min.js"></script>
+      <script>
+        $(function () {
+          $('select').multipleSelect()
+        })
+      </script>
+      <script>
+        const logoInput = document.getElementById("logo_upload");
+        const logoPreview = document.getElementById("logo_preview");
+        logoInput.onchange = (e) => {
+          const [file] = logoInput.files;
+          if (file) {
+            logoPreview.style.background =
+              "url(" + URL.createObjectURL(file) + ") 0 0/100% 100% no-repeat";
+            logoPreview.innerHTML = "";
+          }
+        };
+        
+        let btn = document.querySelector('#send_profile')
+        btn.addEventListener('click',function(){
+          let company = document.querySelector('input[name$="company"]');
+          let legal_entity = document.querySelector('input[name$="legal_entity"]');
+          let product_address = document.querySelector('input[name$="product_address"]');
+          let contact_entity = document.querySelector('input[name$="contact_entity"]');
+          let contact_phone = document.querySelector('input[name$="contact_phone"]');
+          let service_entity = document.querySelector('input[name$="service_entity"]');
+          let service_phone = document.querySelector('input[name$="service_phone"]');
+          let service_email = document.querySelector('input[name$="service_email"]');
+          let description = document.querySelector('textarea[name$="description"]');
+          if (company.value == '' || legal_entity.value == '' || product_address.value == '' || contact_entity.value == '' || contact_phone.value == '' || service_entity.value == '' || service_phone.value == '' || service_email.value == '' || description.value == ''){
+            alert('Заполните все поля')
+          }
+          else {
+            let f = document.querySelector('#profile')
+            f.submit()
+          }
+        })
+  
+        const hamb = document.querySelector("#hamb");
+        const popup = document.querySelector("#popup");
+        const body = document.body;
+  
+        const menu = document.querySelector("#menu").cloneNode(1);
+  
+        hamb.addEventListener("click", hambHandler);
+  
+        function hambHandler(e) {
+          e.preventDefault();
+          popup.classList.toggle("open");
+          hamb.classList.toggle("active");
+          body.classList.toggle("noscroll");
+          renderPopup();
+        }
+  
+        function renderPopup() {
+          popup.appendChild(menu);
+        }
+  
+        const links = Array.from(menu.children);
+  
+        links.forEach((link) => {
+          link.addEventListener("click", closeOnClick);
+        });
+  
+        function closeOnClick() {
+          popup.classList.remove("open");
+          hamb.classList.remove("active");
+          body.classList.remove("noscroll");
+        }
+      </script>
+  </body>
+</html>
