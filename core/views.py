@@ -42,7 +42,7 @@ def login_view(request):
         if request.user.is_authenticated:
             return redirect(index)
         login_form = LoginForm()
-    return render(request, 'index.html', {'form': login_form})
+    return render(request, 'login.html', {'form': login_form})
 
 
 
@@ -107,11 +107,8 @@ def index(request):
 @login_required(login_url='/login/')
 def diler_orders(request):
     if request.user.profile.spec == 'D':
-        s = Shape.objects.all()
-        i = Implement.objects.all()
-        r = Region.objects.all()
         orders = request.user.profile.diler.order_set.all()
-        return render(request, 'orders_alt.html', {"profile": request.user.profile, 'shapes': s, 'implements': i, 'orders': orders, 'regions' : r})
+        return render(request, 'orders-diler.html', {'orders': orders})
     else:
         return HttpResponseForbidden()
 
@@ -121,60 +118,60 @@ def diler_orders(request):
 def diler_order(request, id):
     if request.user.profile.spec == 'D':
         order = request.user.profile.diler.order_set.get(id=id)
-        s = Shape.objects.all()
-        i = Implement.objects.all()
-        r = Region.objects.all()
-        return render(request, 'layout.html', {"profile": request.user.profile, 'order': order, 'shapes': s, 'implements': i, 'regions' : r})
+        return render(request, 'order-diler.html', {'order': order})
     else:
         return HttpResponseForbidden()
 
     
 
 
-@require_POST
 @login_required(login_url='/login/')
 def diler_profile_save(request):
-    user = request.user
-    user.profile.fio = request.POST['fio']
-    user.profile.phone_number = request.POST['phone']
-    user.profile.email = request.POST['email']
-    user.profile.save()
-    user.profile.diler.organization = request.POST['company']
-    user.profile.diler.warehouse_address = request.POST['warehouse_address']
-    try:
-        user.profile.diler.logo = request.FILES['logo']
-    except KeyError:
-        pass
-    user.profile.diler.region_id = request.POST['region']
-    if 'submitemail' not in request.POST:
-        user.profile.diler.isEmailsubmit = False
+    if request.method == 'GET':
+        regions = Region.objects.all()
+        return render(request, 'diler-profile.html', {'regions': regions})
     else:
-        user.profile.diler.isEmailsubmit = True
-    user.profile.diler.save()
-    return redirect(diler_orders)
+        user = request.user
+        user.profile.fio = request.POST['fio']
+        user.profile.phone_number = request.POST['phone']
+        user.profile.email = request.POST['email']
+        user.profile.save()
+        user.profile.diler.organization = request.POST['company']
+        user.profile.diler.warehouse_address = request.POST['warehouse_address']
+        try:
+            user.profile.diler.logo = request.FILES['logo']
+        except KeyError:
+            pass
+        user.profile.diler.region_id = request.POST['region']
+        user.profile.diler.save()
+        return redirect(diler_orders)
 
 
 
 
-@require_POST
 @login_required(login_url='/login/')
 def order_save(request):
-    user = request.user
-    order = user.profile.diler.order_set.create(shape_id=request.POST['shape'],implement_id=request.POST['implement'],address=request.POST['address'], type_pay=request.POST['type_pay'], type_delivery=request.POST['type_delivery'], amount_window=int(request.POST['amount']), price=request.POST['price'], comment=request.POST['comment'])
-    files = request.FILES.getlist('upl')
-    f = []
-    os.system('rm -rf scetch.zip')
-    for file in files:
-        f.append(file.temporary_file_path())
-    os.system('rm -rf scetch.zip')
-    patoolib.create_archive('scetch.zip',f)
-    path = Path('scetch.zip')
-    with path.open(mode='rb') as f:
-        order.file = File(f,name=path.name)
-        order.save()
-    os.system('rm -rf scetch.zip')
-    sendmass.delay(order.id, True)
-    return redirect(diler_orders)
+    if request.method == 'GET':
+        shapes = Shape.objects.all()
+        implements = Implement.objects.all()
+        return render(request, 'new-order.html', {'shapes': shapes, 'implements': implements})
+    else:
+        user = request.user
+        order = user.profile.diler.order_set.create(shape_id=request.POST['shape'],implement_id=request.POST['implement'],address=request.POST['address'], type_pay=request.POST['type_pay'], type_delivery=request.POST['type_delivery'], amount_window=int(request.POST['amount']), price=request.POST['price'], comment=request.POST['comment'])
+        files = request.FILES.getlist('upl')
+        f = []
+        os.system('rm -rf scetch.zip')
+        for file in files:
+            f.append(file.temporary_file_path())
+        os.system('rm -rf scetch.zip')
+        patoolib.create_archive('scetch.zip',f)
+        path = Path('scetch.zip')
+        with path.open(mode='rb') as f:
+            order.file = File(f,name=path.name)
+            order.save()
+        os.system('rm -rf scetch.zip')
+        sendmass.delay(order.id, True)
+        return redirect(diler_orders)
 
 
 
@@ -184,56 +181,57 @@ def order_save(request):
 
 
 @login_required(login_url='/login/')
-@require_POST
 def provider_profile(request):
     if request.user.profile.spec == 'P':
-        p = request.user.profile.provider
-        flag = False
-        if len(p.regions.all()) == 0:
-            flag = True
-        p.user = request.user.profile
-        p.company = request.POST['company']
-        p.legal_entity = request.POST['legal_entity']
-        p.product_address = request.POST['product_address']
-        p.contact_entity = request.POST['contact_entity']
-        p.contact_phone = request.POST['contact_phone']
-        p.service_entity = request.POST['service_entity']
-        p.service_phone = request.POST['service_phone']
-        p.service_email = request.POST['service_email']
-        if 'submitemail' not in request.POST:
-            p.isEmailsubmit = False
+        if request.method == 'GET':
+            shapes = Shape.objects.all()
+            implements = Implement.objects.all()
+            regions = Region.objects.all()
+            return render(request, 'profile-company.html', {'shapes': shapes, 'implements': implements, 'regions': regions})
         else:
-            p.isEmailsubmit = True
-        
-        try: 
-            p.logo = request.FILES['logo']
-        except KeyError:
-            pass
-        p.description = request.POST['description']
-        p.save()
-        try:
-            p.shapes.clear()
-            for i in request.POST.getlist('shapes'):
-                p.shapes.add(Shape.objects.get(id=i))
-        except KeyError:
-            p.shapes.clear()
-        try:
-            p.implements.clear()   
-            for i in request.POST.getlist('implements'):
-                p.implements.add(Implement.objects.get(id=i))  
-        except KeyError:
-            p.implements.clear() 
-        try:
-            p.regions.clear()
-            for i in request.POST.getlist('regions'):
-                p.regions.add(Region.objects.get(id=i))
-        except KeyError:
-            p.regions.clear()
+            p = request.user.profile.provider
+            flag = False
+            if len(p.regions.all()) == 0:
+                flag = True
+            p.user = request.user.profile
+            p.company = request.POST['company']
+            p.legal_entity = request.POST['legal_entity']
+            p.product_address = request.POST['product_address']
+            p.contact_entity = request.POST['contact_entity']
+            p.contact_phone = request.POST['contact_phone']
+            p.service_entity = request.POST['service_entity']
+            p.service_phone = request.POST['service_phone']
+            p.service_email = request.POST['service_email']
+            
+            try: 
+                p.logo = request.FILES['logo']
+            except KeyError:
+                pass
+            p.description = request.POST['description']
+            p.save()
+            try:
+                p.shapes.clear()
+                for i in request.POST.getlist('shapes'):
+                    p.shapes.add(Shape.objects.get(id=i))
+            except KeyError:
+                p.shapes.clear()
+            try:
+                p.implements.clear()   
+                for i in request.POST.getlist('implements'):
+                    p.implements.add(Implement.objects.get(id=i))  
+            except KeyError:
+                p.implements.clear() 
+            try:
+                p.regions.clear()
+                for i in request.POST.getlist('regions'):
+                    p.regions.add(Region.objects.get(id=i))
+            except KeyError:
+                p.regions.clear()
 
-        if flag:
-            sendmass(p.id, False)
+            if flag:
+                sendmass(p.id, False)
 
-        return redirect(index)
+            return redirect(index)
     
 
     else:
@@ -246,24 +244,15 @@ def provider_profile(request):
 
 @login_required(login_url='/login/')
 def provider_balance(request):
-    shapes = Shape.objects.all()
-    implements = Implement.objects.all()
-    regions = Region.objects.all()
-    return render(request, 'company_balance.html', {"profile": request.user.profile, 'shapes': shapes, 'implements': implements, 'regions': regions})
+    return render(request, 'balance-company.html')
 
 
 @login_required(login_url='/login/')
 def provider_response(request, id):
-    if request.method == 'GET':
-        if request.user.profile.spec == 'P':
-            order = Order.objects.get(id=id)
-            shapes = Shape.objects.all()
-            implements = Implement.objects.all()
-            regions = Region.objects.all()
-            return render(request, 'company_orders_response.html', {'profile' : request.user.profile, 'order': order, 'shapes': shapes, 'implements': implements, 'regions': regions})
-        return HttpResponseForbidden()
-    else:
-        if request.user.profile.spec == 'P':
+    if request.user.profile.spec == 'P':
+        if request.method == 'GET':
+            return render(request, 'call-out.html', {'order': Order.objects.get(id=id)})
+        else:
             q = Quantity()
             q.order_id = id
             q.author  = request.user.profile.provider
@@ -275,45 +264,34 @@ def provider_response(request, id):
             q.comment = request.POST['comment']
             q.save()
             return redirect(provider_quantity)
+    else:
         return HttpResponseForbidden()
 
 
 @login_required(login_url='/login/')
 def provider_work(request):
-    shapes = Shape.objects.all()
-    implements = Implement.objects.all()
-    regions = Region.objects.all()
-    return render(request, 'company_work.html', {'quantitys': request.user.profile.provider.quantity_set.all(), "profile": request.user.profile, 'shapes': shapes, 'implements': implements, 'regions': regions})
+    return render(request, 'processed-company.html', {'quantitys': request.user.profile.provider.quantity_set.all()})
 
 @login_required(login_url='/login/')
 def provider_archive(request):
-    shapes = Shape.objects.all()
-    implements = Implement.objects.all()
-    regions = Region.objects.all()
-    return render(request, 'provider_archive.html', {'quantitys': request.user.profile.provider.quantity_set.all(), "profile": request.user.profile, 'shapes': shapes, 'implements': implements, 'regions': regions})
+    return render(request, 'archive-company.html', {'quantitys': request.user.profile.provider.quantity_set.all()})
 
 
 @login_required(login_url='/login/')
 def provider_orders(request):
     if request.user.profile.spec == 'P':
-        shapes = Shape.objects.all()
-        implements = Implement.objects.all()
-        regions = Region.objects.all()
         orders = []
         for region in request.user.profile.provider.regions.all():
             for diler in region.diler_set.all():
                 orders += diler.order_set.all()
         orders = sorted(orders, key=lambda item: item.id, reverse=True)
-        return render(request, 'company_orders.html', {'orders': orders, 'profile': request.user.profile, 'shapes': shapes, 'implements': implements, 'regions': regions})
+        return render(request, 'orders-company.html', {'orders': orders})
     else:
         return HttpResponseForbidden()
 
 @login_required(login_url='/login/')
 def provider_quantity(request):
-    shapes = Shape.objects.all()
-    implements = Implement.objects.all()
-    regions = Region.objects.all()
-    return render(request, 'send_quantity.html', {'profile': request.user.profile, 'shapes': shapes, 'implements': implements, 'regions': regions})
+    return render(request, 'send-company.html')
 
 
 
@@ -339,20 +317,14 @@ def diler_response(request, id):
 @login_required(login_url='/login/')
 def diler_work(request):
     if request.user.profile.spec == 'D':
-        shapes = Shape.objects.all()
-        implements = Implement.objects.all()
-        regions = Region.objects.all()
-        return render(request, 'diler_works.html', {'orders': request.user.profile.diler.order_set.all(),"profile": request.user.profile, 'shapes': shapes, 'implements': implements, 'regions': regions})
+        return render(request, 'processed-diler.html', {'orders': request.user.profile.diler.order_set.all()})
     else:
         return HttpResponseForbidden()
 
 @login_required(login_url='/login/')
 def diler_archive(request):
     if request.user.profile.spec == 'D':
-        shapes = Shape.objects.all()
-        implements = Implement.objects.all()
-        regions = Region.objects.all()
-        return render(request, 'diler_archive.html', {'orders': request.user.profile.diler.order_set.all(),"profile": request.user.profile, 'shapes': shapes, 'implements': implements, 'regions': regions})
+        return render(request, 'archive-diler.html', {'orders': request.user.profile.diler.order_set.all()})
     else:
         return HttpResponseForbidden()
     
@@ -361,7 +333,7 @@ def diler_archive(request):
 def company_card(request, id):
     if request.user.profile.spec == 'D':
         p = Provider.objects.get(id=id)
-        return render(request, 'company_card.html', {'provider': p, 'profile': request.user.profile})
+        return render(request, 'company-profile.html', {'provider': p})
     else:
         return HttpResponseForbidden()
 

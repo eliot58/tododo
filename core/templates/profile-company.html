@@ -1,0 +1,217 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль - Поставщик</title>
+    <link rel="shortcut icon" href="{% static 'assets/img/favicon.png' %}" type="image/x-icon"/>
+    <link rel="stylesheet" href="{% static 'assets/libs/multiple-select.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+
+<body>
+    <div class="wrapper__provider">
+        <section class="profile__company row">
+            <div class="profile__navbar col-xl-2">
+                <div class="navbar__content">
+                    <div class="navbar__brand">
+                        <img src="{% static 'assets/img/logo-provider.svg' %}" alt="Todo Поставщик">
+                    </div>
+                    <p>меню</p>
+                    <div class="navbar__links">
+                        <nav> 
+                            <ul>
+                                <li class="nav__link-item nav__link-item-active"><img
+                                        src="{% static 'assets/img/ico/profile-active.svg' %}" alt="profile-active-ico"><a
+                                        href="{% url 'provider_profile' %}">Профиль компании</a></li>
+                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/region.svg' %}"
+                                        alt="Заказы в регионе"><a href="{% url 'provider_orders' %}">Заказы в регионе</a></li>
+                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/balance.svg' %}" alt="Баланс"><a
+                                        href="{% url 'provider_balance' %}">Баланс</a></li>
+                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/kp.svg' %}" alt="Отправлено КП"><a
+                                        href="{% url 'provider_quantity' %}">Отправлено КП</a></li>
+                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/worked.svg' %}" alt="В работе"><a
+                                        href="{% url 'provider_work' %}">В работе</a></li>
+                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/archive.svg' %}" alt="Архив"><a
+                                        href="{% url 'provider_archive' %}">Архив</a></li>
+                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/ads.svg' %}" alt="Реклама"><a
+                                        href="">Реклама</a></li>
+                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/support.svg' %}" alt="Помощь"><a
+                                        href="https://t.me/chattodotodo_bot?start=IGS-6Nn-twD17M6tfFgpg">Помощь</a></li>
+                                <li class="logout nav__link-item "><img src="{% static 'assets/img/ico/logout.svg' %}" alt="Выход"><a
+                                        href="{% url 'logout_core_view' %}"> Выход</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="profile__content col-xl-10">
+                <div class="profile__nav row">
+                    <div class="profile__nav-title col-xl-10">
+                        <h1>Профиль компании</h1>
+                    </div>
+                    <div class="profile__nav-logo col-xl-2 d-flex align-items-center">
+                        <div class="profile__nav-wrapper d-flex align-items-center">
+                            <img src="{% static 'assets/img/profile-logo.svg' %}" alt="logo">
+                            <p class="profile__nav-logo-title">{{ request.user.profile.provider.company }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile__forms">
+                    <form method="post" action="{% url 'provider_profile' %}" enctype="multipart/form-data" class="form">
+                        {% csrf_token %}
+                        <div class="form__upload-logo">
+                            <div class="form__upload-item" {% if request.user.profile.provider.logo %} style="background: url('{{ request.user.profile.provider.logo.url }}');" {% endif %}>
+                                <img src="{% static 'assets/img/ico/upload.svg' %}" alt="Загрузить лого">
+                                <p>Загрузите ваше лого</p>
+                                <button type="button" class="main__btn" onclick="upload_logo()">Выбрать файл</button>
+                                <input
+                                type="file"
+                                accept="image/*"
+                                name="logo"
+                                id="logo_upload"
+                                required
+                                style="position: absolute; bottom: 0; left: 0; z-index: -10;"
+                                />
+                            </div>
+                        </div>
+                        <input class="account__input" required value="{{ request.user.profile.provider.company }}" type="text" placeholder="Название компании" name="company">
+                        <input class="account__input" required value="{{ request.user.profile.provider.legal_entity }}" type="text" placeholder="Юридическое лицо" name="legal_entity">
+                        <input class="account__input" required value="{{ request.user.profile.provider.product_address }}" type="text" placeholder="Адрес производства" name="product_address">
+                        <input class="account__input" required value="{{ request.user.profile.provider.contact_entity }}" type="text" placeholder="Руководитель" name="contact_entity">
+                        <div class="row">
+                            <input type="text" required value="{{ request.user.profile.provider.service_entity }}" class="account__input col" placeholder="Менеджер" name="service_entity">
+                            <input type="tel" required value="{{ request.user.profile.provider.contact_phone }}" class="account__input col" placeholder="Телефон производства" name="contact_phone">
+                        </div>
+                        <div class="row">
+                            <input type="tel" required value="{{ request.user.profile.provider.service_phone }}" class="account__input col" placeholder="Контактный телефон" name="service_phone">
+                            <input type="email" required value="{{ request.user.profile.provider.service_email }}" class="account__input col" placeholder="e-mail" name="service_email">
+                        </div>
+                        <select multiple="multiple" class="account__input multi__select" name="shapes" id="profile__select">
+                            {% for shape in shapes %}
+                            <option value="{{ shape.id }}" {% if shape in request.user.profile.provider.shapes.all %} selected {% endif %}>{{ shape.data }}</option>
+                            {% endfor %}
+                        </select>
+                        <select multiple="multiple" class="account__input multi__select" name="implements" id="profile__select">
+                            {% for implement in implements %}
+                            <option value="{{ implement.id }}" {% if implement in request.user.profile.provider.implements.all %} selected {% endif %}>{{ implement.data }}</option>
+                            {% endfor %}
+                        </select>
+                        <select multiple="multiple" class="account__input multi__select" name="regions" id="profile__select">
+                            {% for region in regions %}
+                            <option value="{{ region.id }}" {% if region in request.user.profile.provider.regions.all %} selected {% endif %}>{{ region.data }}</option>
+                            {% endfor %}
+                        </select>
+                        <textarea name="description" required class="account__input" cols="10" rows="3" placeholder="О компании">{{ request.user.profile.provider.description }}</textarea>
+                        <button class="form__btn main__btn mt-3 mb-3 mx-auto pl-3 d-flex">Подтвердить</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="response__wrapper">
+        <div class="mb__info-block">
+            <div class="mb__navbar">
+                <div class="mb__nav-logo">
+                    <img src="{% static 'assets/img/logo-diler.svg' %}" alt="logo-diler">
+                </div>
+            </div>
+            <div class="mb__intro">
+                <h1>Сервис для дилеров и производителей окон</h1>
+                <p>Все поставщики в кармане!
+                    Установи <span>Todotodo.дилеры</span> и общайся удобнее</p>
+                <a href="#">Остаться в вэб версии</a>
+            </div>
+        </div>
+        <div class="mb__order">
+            <div class="mb__order-intro">
+                <h1>Делай заказы в один клик</h1>
+                <img src="{% static 'assets/img/order-pana.svg' %}" alt="order-pana">
+                <p>
+                    Получай тысячи предложений с подходящими ценами и срокам изготовления
+                </p>
+                <img src="{% static 'assets/img/mobile-screen.svg' %}" alt="mobile-screen">
+            </div>
+        </div>
+        <div class="mb__functions">
+            <h1>Некоторые отличные функции для вас</h1>
+            <div class="mb__functions-cards">
+                <div class="mb__card mb__card-calendar">
+                    <div class="mb__card-img">
+                        <img src="{% static 'assets/img/ico/calendar.png' %}" alt="calendar">
+                    </div>
+                    <h1>Расчёт одновременно у всех
+                        поставщиков региона</h1>
+                </div>
+                <div class="mb__card mb__card-checklist">
+                    <div class="mb__card-img">
+                        <img src="{% static 'assets/img/ico/checklist.png' %}" alt="checklist">
+                    </div>
+                    <h1>Рейтинг поставщиков
+                        составляют такие же
+                        дилеры как и Вы!</h1>
+                </div>
+                <div class="mb__card mb__card-money">
+                    <div class="mb__card-img">
+                        <img src="{% static 'assets/img/ico/money.png' %}" alt="money">
+                    </div>
+                    <h1>Сравните цену у других,
+                        со своим поставщиком окон</h1>
+                </div>
+            </div>
+        </div>
+        <div class="mb__download">
+            <div class="mb__download-intro">
+                <h1>Скачай совершенно
+                    бесплатно</h1>
+                <div class="mb__download-btn">
+                    <a href="#"><img src="{% static 'assets/img/app-store.svg' %}" alt="app-store"></a>
+                    <a href="#"><img src="{% static 'assets/img/google-play.svg' %}" alt="google-play"></a>
+                </div>
+            </div>
+            <img src="{% static 'assets/img/hand.svg' %}" alt="hand" class="mb__img">
+        </div>
+        <div class="mb__footer">
+            <div class="mb__footer-content">
+                <div class="mb__footer-intro">
+                    <img src="{% static 'assets/img/logo-diler.svg' %}" alt="logo-diler">
+                </div>
+                <div class="mb__footer-social">
+                    <a href="#"><img src="{% static 'assets/img/ico/instagram.svg' %}" alt="instagram"></a>
+                    <a href="#"><img src="{% static 'assets/img/ico/facebook.svg' %}" alt="facebook"></a>
+                    <a href="#"><img src="{% static 'assets/img/ico/telegram.svg' %}" alt="telegram"></a>
+                </div>
+                <div class="mb__footer-support">
+                    <a class="gray__text" href="#"> Условия использования
+                        сервиса </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src="{% static 'assets/libs/multiple-select.min.js' %}"></script>
+    <script>
+        $('.multi__select').multipleSelect()
+        function upload_logo(){
+            document.querySelector('#logo_upload').click();
+        }
+        function upload_logo(){
+            document.getElementById("logo_upload").click();
+        }
+        const logoInput = document.getElementById("logo_upload");
+        const logoPreview = document.querySelector(".form__upload-item");
+        logoInput.onchange = (e) => {
+          const [file] = logoInput.files;
+          if (file) {
+            logoPreview.style.background =
+              "url(" + URL.createObjectURL(file) + ") 0 0/100% 100% no-repeat";
+          }
+        };
+    </script>
+</body>
+
+</html>
