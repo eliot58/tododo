@@ -486,6 +486,9 @@ html {
   font-weight: 400;
   line-height: 15.12px;
   margin-left: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 150px;
   text-decoration: none;
   transition: all 0.3s;
 }
@@ -507,6 +510,9 @@ html {
   font-weight: 400;
   line-height: 15.12px;
   margin-left: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 150px;
   text-decoration: none;
   transition: all 0.3s;
 }
@@ -592,6 +598,7 @@ html {
 .navbar__links nav ul li {
   list-style: none;
 }
+
 
 .profile__company {
   max-width: 100%;

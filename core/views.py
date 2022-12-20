@@ -162,6 +162,7 @@ def order_save(request):
         f = []
         os.system('rm -rf scetch.zip')
         for file in files:
+            print(file)
             f.append(file.temporary_file_path())
         os.system('rm -rf scetch.zip')
         patoolib.create_archive('scetch.zip',f)

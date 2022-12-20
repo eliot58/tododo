@@ -9,7 +9,7 @@
     <title>Заказ - Дилер</title>
     <link rel="shortcut icon" href="{% static 'assets/img/favicon.png' %}" type="image/x-icon"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
@@ -129,9 +129,9 @@
                             <td>{{ quantity.date|date:'d.m.Y' }}</td>
                             <td class="process__file"><a href="{{ quantity.file.url }}" style="text-decoration: none;">{{ quantity.filename }}</a></td>
                             {% if quantity.isresponse %}
-                            <td><button class="process__table-btn" style="background: #080696;" href="{% url 'diler_response' quantity.id %}">Заказано</button></td>
+                            <td><a class="process__table-btn" style="background: #080696; text-decoration: none;" href="{% url 'diler_response' quantity.id %}">Заказано</a></td>
                             {% else %}
-                            <td><button class="process__table-btn" href="{% url 'diler_response' quantity.id %}">Откликнуться</button></td>
+                            <td><a onclick="this.style.background = '#080696'" style="text-decoration: none;" class="process__table-btn" href="{% url 'diler_response' quantity.id %}">Откликнуться</a></td>
                             {% endif %}
                         </tr>
                         {% endfor %}
