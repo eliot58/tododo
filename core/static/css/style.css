@@ -209,9 +209,54 @@ select.call__input {
   background-size: cover;
   background-repeat: no-repeat;
   background-color: #fff8f2;
+  padding-bottom: 20px;
 }
+
+.mb__nav-btns{
+  display: flex;
+  padding-top: 80px;
+  justify-content: space-around;
+}
+
+.mb__nav-btns .btn {
+  background: #FFF8F2;
+  border: 1px solid #15CE73;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+
+.mb__nav-btns .btn span.android {
+  background: url("../assets/img/ico/android.svg") no-repeat;
+  float: left;
+  width: 40px;
+  height: 40px;
+  background-position: center;
+}
+
+.mb__nav-btns .btn span.ios {
+  background: url("../assets/img/ico/apple.svg") no-repeat;
+  float: left;
+  width: 40px;
+  height: 40px;
+  background-position: center;
+}
+
+.mb__nav-btns .btn .btn-link {
+  text-decoration: none;
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0.01em;
+  color: #15CE73;
+  display: block;
+  padding: 15px 20px 15px 20px;
+}
+
 .response__wrapper .mb__navbar {
-  padding: 70px 30px 0 30px;
+  padding: 50px 30px 0 30px;
 }
 .response__wrapper .mb__nav-logo img {
   width: 40%;

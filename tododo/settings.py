@@ -141,6 +141,9 @@ else:
     STATIC_ROOT = '/var/www/tododo/static'
     STATIC_URL = '/static/'
 
+APK_ROOT = os.path.join(BASE_DIR, "apk/")
+APK_URL = '/apk/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
