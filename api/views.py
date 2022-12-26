@@ -325,7 +325,6 @@ class Profiles(views.APIView):
             d['phone'] = str(request.user.profile.phone_number)
             d['email'] = request.user.profile.email
             d['warehouse_address'] = request.user.profile.diler.warehouse_address
-            d['submitemail'] = request.user.profile.diler.isEmailsubmit
             try:
                 d['region'] = request.user.profile.diler.region.data
             except AttributeError:
@@ -347,7 +346,6 @@ class Profiles(views.APIView):
             d['service_entity'] = request.user.profile.provider.service_entity
             d['service_phone'] = request.user.profile.provider.service_phone
             d['service_email'] = request.user.profile.provider.service_email
-            d['submitemail'] = request.user.profile.provider.isEmailsubmit
             d['description'] = request.user.profile.provider.description
             d['shapes'] = []
             shapes = Shape.objects.all()
@@ -388,7 +386,6 @@ class Profiles(views.APIView):
             except KeyError:
                 pass
             user.profile.diler.region_id = Region.objects.get(data=request.data['region']).id
-            user.profile.diler.isEmailsubmit = True if request.data['submitemail']=='true' else False
             user.profile.diler.save()
         else:
             p = request.user.profile.provider
@@ -404,7 +401,6 @@ class Profiles(views.APIView):
             p.service_entity = request.data['service_entity']
             p.service_phone = request.data['service_phone']
             p.service_email = request.data['service_email']
-            p.isEmailsubmit = True if request.data['submitemail']=='true' else False
             try: 
                 p.logo = request.FILES['logo']
             except KeyError:
