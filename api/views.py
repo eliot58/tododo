@@ -480,12 +480,14 @@ class Orderget(views.APIView):
         else:
             order = Order.objects.get(id=id)
             d = {}
+            d['date'] = order.date
             d['shape'] = order.shape.data
             d['implement'] = order.implement.data
             d['address'] = order.address
             d['type_pay'] = rtype_payd[order.type_pay]
             d['type_delivery'] = rtype_deld[int(order.type_delivery)]
             d['price'] = order.price
+            d['count_window'] = order.amount_window
             d['file'] = order.file.url.split('/')[-1]
             d['fileurl'] = order.file.url
             d['comment'] = order.comment
