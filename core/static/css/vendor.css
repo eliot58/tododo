@@ -220,9 +220,11 @@ select.call__input {
 
 .mb__nav-btns .btn {
   background: #FFF8F2;
+  width: 50%;
   border: 1px solid #15CE73;
   border-radius: 8px;
   white-space: nowrap;
+  margin: 7px;
 }
 
 
