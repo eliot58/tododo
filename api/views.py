@@ -94,7 +94,6 @@ def send_quantity(request):
             s['quantity_impl'] = quantity.implement.data
             s['quantity_price'] = quantity.price
             d.append(s)
-    d = sorted(d, key=lambda item: item['id'])
     return Response(d)
 
 class QuantityDel(views.APIView):
