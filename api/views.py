@@ -81,7 +81,7 @@ def isblanked(request):
 @api_view(["GET"])
 def send_quantity(request):
     d = []
-    for quantity in request.user.profile.provider.quantity_set.all():
+    for quantity in request.user.profile.provider.quantity_set.all().order_by('-id'):
         if quantity.order.isactive:
             s = {}
             s['id'] = quantity.id

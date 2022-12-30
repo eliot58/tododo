@@ -74,7 +74,7 @@
                             <th>Желаемая цена</th>
                             <th>Заказ дилера</th>
                         </tr>
-                        {% for quantity in request.user.profile.provider.quantity_set.all %}
+                        {% for quantity in quantitys %}
                         {% if quantity.order.isactive %}
                         <tr class="result__table-body">
                             <td>{{ quantity.order.date|date:'d.m.Y' }}</td>

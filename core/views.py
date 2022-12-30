@@ -107,7 +107,7 @@ def index(request):
 @login_required(login_url='/login/')
 def diler_orders(request):
     if request.user.profile.spec == 'D':
-        orders = request.user.profile.diler.order_set.all()
+        orders = request.user.profile.diler.order_set.all().order_by('-id')
         return render(request, 'orders-diler.html', {'orders': orders})
     else:
         return HttpResponseForbidden()
@@ -292,7 +292,8 @@ def provider_orders(request):
 
 @login_required(login_url='/login/')
 def provider_quantity(request):
-    return render(request, 'send-company.html')
+    quantitys = request.user.profile.provider.quantity_set.all().order_by('-id')
+    return render(request, 'send-company.html', {'quantitys': quantitys})
 
 
 
