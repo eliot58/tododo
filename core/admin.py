@@ -7,11 +7,11 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Diler)
 class DilerAdmin(admin.ModelAdmin):
-    list_display = ['user', 'organization', 'warehouse_address', 'region', 'practice', 'date_register', 'date_last_auth']
+    list_display = ['user', 'organization', 'warehouse_address', 'region', 'practice']
 
 @admin.register(Provider)
 class ProviderAdmin(admin.ModelAdmin):
-    list_display = ['user', 'company', 'product_address', 'contact_phone', 'service_email', 'date_register', 'date_last_auth']
+    list_display = ['user', 'company', 'product_address', 'contact_phone', 'service_email']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):

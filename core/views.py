@@ -60,9 +60,9 @@ def signup(request):
             spec = 'Дилер' if request.POST['spec']=='D' else 'Поставщик окон'
             p = Profile.objects.create(user=new_user,fio=cd['fio'],spec=request.POST['spec'],email=cd['email'],phone_number=cd['phone'])
             if request.POST['spec']=='D':
-                Diler.objects.create(user=p, date_last_auth = datetime.datetime.utcnow().replace(tzinfo=utc))
+                Diler.objects.create(user=p)
             else:
-                Provider.objects.create(user=p, date_last_auth = datetime.datetime.utcnow().replace(tzinfo=utc))
+                Provider.objects.create(user=p)
 
             msg = 'Вы зарегистрировались как ' + spec + '\n' + 'Ваш login: ' + request.POST['email'] + '\n' + 'Ваш password: ' + password
             try:
@@ -91,12 +91,8 @@ def index(request):
         logout(request)
         return redirect(login_view)
     if request.user.profile.spec == 'D':
-        request.user.profile.diler.date_last_auth = datetime.datetime.utcnow().replace(tzinfo=utc)
-        request.user.profile.diler.save()
         return redirect(diler_orders)
     else:
-        request.user.profile.provider.date_last_auth = datetime.datetime.utcnow().replace(tzinfo=utc)
-        request.user.profile.provider.save()
         return redirect(provider_orders)
 
 

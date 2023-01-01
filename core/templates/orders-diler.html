@@ -91,6 +91,9 @@
                             <td>
                                 <a href="{% url 'diler_order' order.id %}" class="response">Подробно</a>
                             </td>
+                            <td>
+                                <a href="{% url 'order_delete' order.id %}"><img src="{% static 'assets/img/delete.svg' %}" alt=""></a>
+                            </td>
                         </tr>
                         {% endif %}
                         {% endfor %}

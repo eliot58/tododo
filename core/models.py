@@ -58,8 +58,6 @@ class Diler(models.Model):
     warehouse_address = models.CharField(max_length=200, default='', verbose_name='Адрес склада')
     region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Регион')
     practice = models.PositiveIntegerField(default=0, verbose_name='Опыт')
-    date_register = models.DateField(auto_now_add=True, verbose_name='Дата регистрации')
-    date_last_auth = models.DateTimeField(verbose_name='Дата последнего входа')
     isEmailsubmit = models.BooleanField(default=True)
 
 
@@ -82,8 +80,6 @@ class Provider(models.Model):
     implements = models.ManyToManyField(Implement, verbose_name='Фурнитуры')
     logo = models.FileField(upload_to='provider/logo', null=True, blank=True, verbose_name='Логотип')
     description = models.TextField(default='', verbose_name='О компании')
-    date_register = models.DateField(auto_now_add=True, verbose_name='Дата регистрации')
-    date_last_auth = models.DateTimeField(verbose_name='Дата последнего входа')
     isEmailsubmit = models.BooleanField(default=True)
 
 
