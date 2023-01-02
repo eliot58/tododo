@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="yandex-verification" content="59bbaad07af109a0" />
-    <title>Архив - Поставщик</title>
+    <title>В работе - Дилер</title>
     <link rel="shortcut icon" href="{% static 'assets/img/favicon.png' %}" type="image/x-icon"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'css/vendor.css' %}">
@@ -15,49 +15,49 @@
 
 <body>
     <div class="wrapper__provider">
+        <div class="popup-profile-page popup-fade" id="send__modal">
+            <div class="popup">
+                <img src="{% static 'assets/img/profile.svg' %}" alt="profile">
+                <h1>Заполните свой профиль</h1>
+                <a id="close__modal" href="{% url 'dil_save' %}" class="btn main__btn rating__btn">Мой профиль</a>
+            </div>
+        </div>
         <section class="balance__company row">
             <div class="profile__navbar col-xl-2">
                 <div class="navbar__content">
                     <div class="navbar__brand">
-                        <img src="{% static 'assets/img/logo-provider.svg' %}" alt="Todo Поставщик">
+                        <img src="{% static 'assets/img/logo-diler.svg' %}" alt="Todo Дилер">
                     </div>
-                    <p>меню</p>
+                    <p class="nav__diler-menu">меню</p>
                     <div class="navbar__links">
                         <nav>
                             <ul>
-                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/profile.svg' %}"
-                                        alt="profile-active-ico"><a href="{% url 'provider_profile' %}">Профиль компании</a>
+                                <li class="nav__link-diler-item "><img src="{% static 'assets/img/ico/profile-diler.svg' %}"
+                                        alt="Мой профиль"><a href="{% url 'dil_save' %}">Мой профиль</a>
                                 </li>
-                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/region.svg' %}"
-                                        alt="Заказы в регионе"><a href="{% url 'provider_orders' %}">Заказы в регионе</a></li>
-                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/balance.svg' %}" alt="Баланс"><a
-                                        href="{% url 'provider_balance' %}">Баланс</a>
-                                </li>
-                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/kp.svg' %}" alt="Отправлено КП"><a
-                                        href="{% url 'provider_quantity' %}">Отправлено КП</a></li>
-                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/worked.svg' %}" alt="В работе"><a
-                                        href="{% url 'provider_work' %}">В работе</a>
-                                </li>
-                                <li class="nav__link-item nav__link-item-active">
-                                    <div class="archive__ico">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M9 22H7C3 22 2 21 2 17V7C2 3 3 2 7 2H8.5C10 2 10.33 2.44001 10.9 3.20001L12.4 5.20001C12.78 5.70001 13 6 14 6H17C21 6 22 7 22 11V13"
-                                                stroke="#8A8A8A" stroke-width="1.5" stroke-miterlimit="10"
-                                                stroke-linecap="round" stroke-linejoin="round" />
-                                            <path
-                                                d="M13.7601 18.32C11.4101 18.49 11.4101 21.89 13.7601 22.06H19.3201C19.9901 22.06 20.6501 21.81 21.1401 21.36C22.7901 19.92 21.91 17.04 19.74 16.77C18.96 12.08 12.1801 13.86 13.7801 18.33"
-                                                stroke="#8A8A8A" stroke-width="1.5" stroke-miterlimit="10"
-                                                stroke-linecap="round" stroke-linejoin="round" />
+                                <li class="nav__link-diler-item"><img
+                                        src="{% static 'assets/img/ico/my-order.svg' %}" alt="Мои заказы"><a href="{% url 'diler_orders' %}">Мои
+                                        заказы</a></li>
+                                <li class="nav__link-diler-item nav__link-item-diler-active">
+                                    <div class="diler_work__ico">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M20.5 11.3V7.04001C20.5 3.01001 19.56 2 15.78 2H8.22C4.44 2 3.5 3.01001 3.5 7.04001V18.3C3.5 20.96 4.96001 21.59 6.73001 19.69L6.73999 19.68C7.55999 18.81 8.80999 18.88 9.51999 19.83L10.53 21.18" stroke="#9B9696" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M8 7H16" stroke="#9B9696" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M9 11H15" stroke="#9B9696" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M18.211 14.7703L14.671 18.3103C14.531 18.4503 14.401 18.7103 14.371 18.9003L14.181 20.2503C14.111 20.7403 14.451 21.0803 14.941 21.0103L16.291 20.8203C16.481 20.7903 16.751 20.6603 16.881 20.5203L20.421 16.9803C21.031 16.3703 21.321 15.6603 20.421 14.7603C19.531 13.8703 18.821 14.1603 18.211 14.7703Z" stroke="#9B9696" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M17.6992 15.2803C17.9992 16.3603 18.8392 17.2003 19.9192 17.5003" stroke="#9B9696" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
-                                    </div>
-                                    <a href="{% url 'provider_archive' %}">Архив</a>
+                                    </div>    
+                                    <a href="{% url 'diler_work' %}">Заказы в работе</a>
                                 </li>
-                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/ads.svg' %}" alt="Реклама"><a
-                                        href="">Реклама</a></li>
-                                <li class="nav__link-item "><img src="{% static 'assets/img/ico/support.svg' %}" alt="Помощь"><a
-                                        href="https://t.me/chattodotodo_bot?start=IGS-6Nn-twD17M6tfFgpg">Помощь</a></li>
+                                <li class="nav__link-diler-item "><img src="{% static 'assets/img/ico/archive.svg' %}" alt="Архив"><a
+                                    href="{% url 'diler_archive' %}">Архив</a></li>
+                                <li class="nav__link-diler-item"><img src="{% static 'assets/img/ico/support.svg' %}" alt="Помощь"><a
+                                        href="https://t.me/chattodotodo_bot?start=IGS-6Nn-twD17M6tfFgpg">Помощь</a>
+                                </li>
+                                <hr class="nav__link-diler">
+                                <button type="button" onclick="checkProfile()" class="main__btn d-flex justify-content-center align-items-center mx-auto new__order"><img
+                                    class="px-1" src="{% static 'assets/img/ico/add.svg' %}" alt="add">Создать заказ</button>
                                 <li class="logout nav__link-item "><img src="{% static 'assets/img/ico/logout.svg' %}" alt="Выход"><a
                                         href="{% url 'logout_core_view' %}"> Выход</a></li>
                             </ul>
@@ -68,12 +68,12 @@
             <div class="profile__content col-xl-10">
                 <div class="profile__nav row">
                     <div class="profile__nav-title col-xl-10">
-                        <h1>Архив</h1>
+                        <h1>Заказы в регионе</h1>
                     </div>
                     <div class="profile__nav-logo col-xl-2 d-flex align-items-center">
                         <div class="profile__nav-wrapper d-flex align-items-center">
-                            <img src="{% static 'assets/img/profile-logo.svg' %}" alt="logo">
-                            <p class="profile__nav-logo-title">{{ request.user.profile.provider.company }}</p>
+                            <img src="{% static 'assets/img/ico/profile-logo-diler.svg' %}" alt="logo">
+                            <p class="profile__nav-logo-title">{{ request.user.profile.fio }}</p>
                         </div>
                     </div>
                 </div>
@@ -81,40 +81,28 @@
                     <table class="result__table">
                         <tr class="result__table-head">
                             <th>Дата</th>
+                            <th>Количество КП</th>
+                            <th>Желаемая цена</th>
                             <th>Профиль</th>
                             <th>Фурнитура</th>
-                            <th>Стоимость</th>
-                            <th>Ваше КП</th>
-                            <th>Имя</th>
-                            <th>Эскиз диллера</th>
+                            <th>Адрес</th>
                         </tr>
-                        {% for quantity in quantitys %}
+                        {% for order in orders %}
+                        {% for quantity in order.quantity_set.all %}
                         {% if quantity.isresponse %}
                         {% if quantity.order.isactive %}
-
-                        {% else %}
                         <tr class="result__table-body">
-                            <td>{{ quantity.date|date:'d.m.Y' }}</td>
-                            <td>{{ quantity.shape }}</td>
-                            <td>{{ quantity.implement }}</td>
-                            <td>{{ quantity.price }}</td>
-                            <td><a href="{{ quantity.file.url }}" style="text-decoration: none;">{{ quantity.filename }}</a></td>
-                            <td>
-                                <div id="accordeon" class="acc__container">
-                                    <div class="acc__head">
-                                        {{ quantity.order.user.user.fio }}
-                                        <img src="{% static 'assets/img/ico/slideup.svg' %}" alt="slideup">
-                                    </div>
-                                    <div class="acc__body">
-                                        <p>{{ quantity.order.user.user.phone_number }}</p>
-                                        <p>{{ quantity.order.user.user.email }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><a href="{{ quantity.order.file.url }}"><img src="{% static 'assets/img/ico/folder.svg' %}" alt="img-ico"></a></td>
+                            <td>{{ quantity.order.date|date:'d.m.Y' }}</td>
+                            <td class="table__item-center">{{ order.quantity_set.all|length }}</td>
+                            <td>{{ quantity.order.price }}</td>
+                            <td>{{ quantity.order.shape.data }}</td>
+                            <td>{{ quantity.order.implement.data }}</td>
+                            <td>{{ quantity.order.address }}</td>
+                            
                         </tr>
                         {% endif %}
                         {% endif %}
+                        {% endfor %}
                         {% endfor %}
                     </table>
                 </div>
@@ -167,7 +155,7 @@
                 </div>
                 <div class="mb__card mb__card-checklist">
                     <div class="mb__card-img">
-                        <img src="{% static 'assets/img/ico/checklist.svg' %}" alt="checklist">
+                        <img src="{% static 'assets/img/ico/checklist.png' %}" alt="checklist">
                     </div>
                     <h1>Рейтинг поставщиков
                         составляют такие же
@@ -210,14 +198,49 @@
             </div>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-    <script src="{% static 'assets/js/script.js' %}"></script>
+    <script>
+    function checkProfile() {
+        let data = {};
+        data = JSON.stringify(data);
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/diler/check");
+        xhr.responseType = 'json';
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(data);
+        xhr.onload = () => {
+            if (xhr.status == 200) {
+            if (xhr.response['res']) {
+                window.location.pathname = '{% url "order_save" %}';
+            } else {
+                document.querySelector('.popup-profile-page').style.display = 'block';
+            }
+            }
+        }
+    }
+    </script>
     <script>
         window.replainSettings = { id: 'e0e3e15f-5e92-4a18-b1fc-cd3da63621ce' };
         (function(u){var s=document.createElement('script');s.async=true;s.src=u;
         var x=document.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);
         })('https://widget.replain.cc/dist/client.js');
     </script>
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript" >
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+    
+        ym(91905902, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true,
+            webvisor:true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/91905902" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
 </body>
 
 </html>

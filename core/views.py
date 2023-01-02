@@ -36,12 +36,12 @@ def login_view(request):
                 login(request, user)
                 return redirect(index)
             else:
-                return render(request, 'disable.html')
+                return render(request, 'auth/disable.html')
     else:
         if request.user.is_authenticated:
             return redirect(index)
         login_form = LoginForm()
-    return render(request, 'login.html', {'form': login_form})
+    return render(request, 'auth/login.html', {'form': login_form})
 
 
 
@@ -68,12 +68,12 @@ def signup(request):
                 send_mail('Регистрация в todotodo', msg, settings.EMAIL_HOST_USER, [request.POST['email']], fail_silently=False)
             except:
                 new_user.delete()
-                return render(request, 'lose_register.html')
-            return render(request, 'register_success.html')
+                return render(request, 'auth/lose_register.html')
+            return render(request, 'auth/register_success.html')
     else:
         profile_form = ProfileForm()
 
-    return render(request, 'register.html', {'form': profile_form})
+    return render(request, 'auth/register.html', {'form': profile_form})
 
 def logout_view(request):
     logout(request)
@@ -103,7 +103,7 @@ def index(request):
 def diler_orders(request):
     if request.user.profile.spec == 'D':
         orders = request.user.profile.diler.order_set.all().order_by('-id')
-        return render(request, 'orders-diler.html', {'orders': orders})
+        return render(request, 'diler/orders-diler.html', {'orders': orders})
     else:
         return HttpResponseForbidden()
 
@@ -113,7 +113,7 @@ def diler_orders(request):
 def diler_order(request, id):
     if request.user.profile.spec == 'D':
         order = request.user.profile.diler.order_set.get(id=id)
-        return render(request, 'order-diler.html', {'order': order})
+        return render(request, 'diler/order-diler.html', {'order': order})
     else:
         return HttpResponseForbidden()
 
@@ -124,7 +124,7 @@ def diler_order(request, id):
 def diler_profile_save(request):
     if request.method == 'GET':
         regions = Region.objects.all()
-        return render(request, 'diler-profile.html', {'regions': regions})
+        return render(request, 'diler/diler-profile.html', {'regions': regions})
     else:
         user = request.user
         user.profile.fio = request.POST['fio']
@@ -149,7 +149,7 @@ def order_save(request):
     if request.method == 'GET':
         shapes = Shape.objects.all()
         implements = Implement.objects.all()
-        return render(request, 'new-order.html', {'shapes': shapes, 'implements': implements})
+        return render(request, 'diler/new-order.html', {'shapes': shapes, 'implements': implements})
     else:
         user = request.user
         order = user.profile.diler.order_set.create(shape_id=request.POST['shape'],implement_id=request.POST['implement'],address=request.POST['address'], type_pay=request.POST['type_pay'], type_delivery=request.POST['type_delivery'], amount_window=int(request.POST['amount']), price=request.POST['price'], comment=request.POST['comment'])
@@ -183,7 +183,7 @@ def provider_profile(request):
             shapes = Shape.objects.all()
             implements = Implement.objects.all()
             regions = Region.objects.all()
-            return render(request, 'profile-company.html', {'shapes': shapes, 'implements': implements, 'regions': regions})
+            return render(request, 'provider/profile-company.html', {'shapes': shapes, 'implements': implements, 'regions': regions})
         else:
             p = request.user.profile.provider
             flag = False
@@ -240,14 +240,14 @@ def provider_profile(request):
 
 @login_required(login_url='/login/')
 def provider_balance(request):
-    return render(request, 'balance-company.html')
+    return render(request, 'provider/balance-company.html')
 
 
 @login_required(login_url='/login/')
 def provider_response(request, id):
     if request.user.profile.spec == 'P':
         if request.method == 'GET':
-            return render(request, 'call-out.html', {'order': Order.objects.get(id=id)})
+            return render(request, 'provider/call-out.html', {'order': Order.objects.get(id=id)})
         else:
             q = Quantity()
             q.order_id = id
@@ -266,11 +266,11 @@ def provider_response(request, id):
 
 @login_required(login_url='/login/')
 def provider_work(request):
-    return render(request, 'processed-company.html', {'quantitys': request.user.profile.provider.quantity_set.all()})
+    return render(request, 'provider/processed-company.html', {'quantitys': request.user.profile.provider.quantity_set.all()})
 
 @login_required(login_url='/login/')
 def provider_archive(request):
-    return render(request, 'archive-company.html', {'quantitys': request.user.profile.provider.quantity_set.all()})
+    return render(request, 'provider/archive-company.html', {'quantitys': request.user.profile.provider.quantity_set.all()})
 
 
 @login_required(login_url='/login/')
@@ -281,14 +281,14 @@ def provider_orders(request):
             for diler in region.diler_set.all():
                 orders += diler.order_set.all()
         orders = sorted(orders, key=lambda item: item.id, reverse=True)
-        return render(request, 'orders-company.html', {'orders': orders})
+        return render(request, 'provider/orders-company.html', {'orders': orders})
     else:
         return HttpResponseForbidden()
 
 @login_required(login_url='/login/')
 def provider_quantity(request):
     quantitys = request.user.profile.provider.quantity_set.all().order_by('-id')
-    return render(request, 'send-company.html', {'quantitys': quantitys})
+    return render(request, 'provider/send-company.html', {'quantitys': quantitys})
 
 
 
@@ -314,14 +314,14 @@ def diler_response(request, id):
 @login_required(login_url='/login/')
 def diler_work(request):
     if request.user.profile.spec == 'D':
-        return render(request, 'processed-diler.html', {'orders': request.user.profile.diler.order_set.all()})
+        return render(request, 'diler/processed-diler.html', {'orders': request.user.profile.diler.order_set.all()})
     else:
         return HttpResponseForbidden()
 
 @login_required(login_url='/login/')
 def diler_archive(request):
     if request.user.profile.spec == 'D':
-        return render(request, 'archive-diler.html', {'orders': request.user.profile.diler.order_set.all()})
+        return render(request, 'diler/archive-diler.html', {'orders': request.user.profile.diler.order_set.all()})
     else:
         return HttpResponseForbidden()
     
@@ -330,7 +330,7 @@ def diler_archive(request):
 def company_card(request, id):
     if request.user.profile.spec == 'D':
         p = Provider.objects.get(id=id)
-        return render(request, 'company-profile.html', {'provider': p})
+        return render(request, 'diler/company-profile.html', {'provider': p})
     else:
         return HttpResponseForbidden()
 
