@@ -61,6 +61,10 @@ class Diler(models.Model):
     isEmailsubmit = models.BooleanField(default=True)
 
 
+    def __str__(self):
+        return self.user.fio
+
+
     class Meta:
         verbose_name = 'Дилер'
         verbose_name_plural = 'Дилеры'
@@ -81,6 +85,9 @@ class Provider(models.Model):
     logo = models.FileField(upload_to='provider/logo', null=True, blank=True, verbose_name='Логотип')
     description = models.TextField(default='', verbose_name='О компании')
     isEmailsubmit = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.user.fio
 
 
     class Meta:
