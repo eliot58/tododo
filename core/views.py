@@ -13,7 +13,6 @@ from django.core.files import File
 from pathlib import Path
 import patoolib
 import os
-import datetime
 from django.utils.timezone import utc
 from django.views.decorators.csrf import csrf_exempt
 import logging

@@ -13,8 +13,33 @@ class DilerAdmin(admin.ModelAdmin):
 class ProviderAdmin(admin.ModelAdmin):
     list_display = ['user', 'company', 'product_address', 'contact_phone', 'service_email']
 
+
+class OrderFilter(admin.SimpleListFilter):
+    title = ('status')
+
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('active', ('active')),
+            ('inactive', ('not active ')),
+        )
+
+    def queryset(self, request, queryset):
+
+        if self.value() == 'active':
+            return queryset.filter(
+                isactive=True
+            )
+        if self.value() == 'inactive':
+            return queryset.filter(
+                isactive= False
+            )
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    list_filter = (OrderFilter,)
     list_display = ['user', 'date', 'price', 'shape', 'implement', 'address']
 
 @admin.register(Region)
