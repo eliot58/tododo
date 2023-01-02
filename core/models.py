@@ -50,6 +50,9 @@ class Profile(models.Model):
         verbose_name = 'Аккаунт'
         verbose_name_plural = 'Аккаунты'
 
+    def __str__(self):
+        return self.fio
+
 
 class Diler(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE, verbose_name='Дилер')
