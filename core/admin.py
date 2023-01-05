@@ -54,3 +54,8 @@ class ShapeAdmin(admin.ModelAdmin):
 class ImplementAdmin(admin.ModelAdmin):
     list_display = ['data']
 
+
+@admin.register(Price)
+class ImplementAdmin(admin.ModelAdmin):
+    list_display = ['title', 'price', 'description']
+

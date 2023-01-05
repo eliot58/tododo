@@ -828,6 +828,61 @@ html {
   padding: 16px 26px;
 }
 
+.balance_card_list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.balance_card_list .card{
+  width: 15%;
+  margin: 40px;
+  box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.05);
+}
+
+.balance_card_list .card .title{
+  padding: 12px 80px;
+  text-align: center;
+  background-color:#EBEBEB;
+  font-family: 'Outfit';
+  font-size: 16px;
+  font-weight: 500;
+  border: 0.5px solid #EBEBEB;
+  margin-bottom: 0px;
+}
+
+.balance_card_list .card .inner_card{
+  padding: 16px 24px;
+  border: 0.5px solid #ECECEC;
+}
+
+.balance_card_list .card .inner_card .price{
+  color: #080696;
+  font-family: 'Outfit';
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.balance_card_list .card .inner_card .description{
+  font-family: 'Outfit';
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.balance_card_list .card .inner_card a{
+  display: block;
+  background-color: #15CE73;
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+  padding: 5px 0px;
+  border-radius: 8px;
+}
+
+
+
+
 .process__work {
   margin: 40px 50px;
   box-shadow: 0px 4px 54px 0px rgba(0, 0, 0, 0.1176470588);

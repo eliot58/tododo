@@ -240,7 +240,7 @@ def provider_profile(request):
 
 @login_required(login_url='/login/')
 def provider_balance(request):
-    return render(request, 'provider/balance-company.html')
+    return render(request, 'provider/balance-company.html', {'prices': Price.objects.all().order_by('price')})
 
 
 @login_required(login_url='/login/')

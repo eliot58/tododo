@@ -155,6 +155,16 @@ class Quantity(models.Model):
         return os.path.basename(self.file.name)
 
 
+class Price(models.Model):
+    title = models.CharField(max_length=20)
+    price = models.PositiveBigIntegerField()
+    description = models.CharField(max_length=50)
+
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+
 
 
 

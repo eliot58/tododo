@@ -31,7 +31,7 @@
                                 <li class="nav__link-item "><img src="{% static 'assets/img/ico/region.svg' %}"
                                         alt="Заказы в регионе"><a href="{% url 'provider_orders' %}">Заказы в регионе</a></li>
                                 <li class="nav__link-item nav__link-item-active"><img
-                                        src="{% static 'assets/img/ico/balance-active.svg' %}" alt="Баланс"><a href="{% url 'provider_balance' %}">Баланс</a>
+                                        src="{% static 'assets/img/ico/balance-active.svg' %}" alt="Подписка"><a href="{% url 'provider_balance' %}">Подписка</a>
                                 </li>
                                 <li class="nav__link-item "><img src="{% static 'assets/img/ico/kp.svg' %}" alt="Отправлено КП"><a
                                         href="{% url 'provider_quantity' %}">Отправлено КП</a></li>
@@ -53,7 +53,7 @@
             <div class="profile__content col-xl-10">
                 <div class="profile__nav row">
                     <div class="profile__nav-title col-xl-10">
-                        <h1>Мой баланс</h1>
+                        <h1>Подписка</h1>
                     </div>
                     <div class="profile__nav-logo col-xl-2 d-flex align-items-center">
                         <div class="profile__nav-wrapper d-flex align-items-center">
@@ -62,22 +62,23 @@
                         </div>
                     </div>
                 </div>
-                <div class="balance__card">
-                    <div class="balance__card-intro d-flex">
-                        <div class="balance__img">
-                            <img src="{% static 'assets/img/ico/wallet.svg' %}" alt="Баланс">
+                <div class="balance_card_list">
+                    {% for price in prices %}
+                    <div class="card">
+                        <p class="title">
+                            {{ price.title }}
+                        </p>
+                        <div class="inner_card">
+                            <p class="price">
+                                {{ price.price }} р
+                            </p>
+                            <p class="description">
+                                {{ price.description }}
+                            </p>
+                            <a href="#">Купить</a>
                         </div>
-                        <div class="profile__nav-title balance__nav-title">
-                            <h1>Доступный баланс</h1>
-                        </div>
                     </div>
-                    <div class="balance__card-pd balance__accessible-item ">
-                        <h1>0 р</h1>
-                    </div>
-                    <div class="balance__card-pd balance__control-items">
-                        <a href="#"><button class=" balance__btn balance__outline outline__btn">Вывести</button></a>
-                        <a href="#"><button class=" balance__btn main__btn">Пополнить</button></a>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </section>
@@ -177,6 +178,7 @@
         var x=document.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);
         })('https://widget.replain.cc/dist/client.js');
     </script>
+    <!-- Yandex.Metrika counter -->
     <script type="text/javascript" >
         (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
         m[i].l=1*new Date();
