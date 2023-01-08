@@ -3,7 +3,11 @@ from .models import *
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['fio', 'spec', 'email', 'phone_number']
+    list_display = ['fio', 'spec', 'email', 'phone_number', 'date_joined']
+
+    @admin.display(ordering='user__date_joined', description='дата регистрации')
+    def date_joined(self, obj):
+        return obj.user.date_joined
 
 @admin.register(Diler)
 class DilerAdmin(admin.ModelAdmin):
