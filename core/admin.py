@@ -12,12 +12,10 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Diler)
 class DilerAdmin(admin.ModelAdmin):
-    search_fields = ("user", )
     list_display = ['user', 'organization', 'warehouse_address', 'region', 'practice']
 
 @admin.register(Provider)
 class ProviderAdmin(admin.ModelAdmin):
-    search_fields = ("user", )
     list_display = ['user', 'company', 'product_address', 'contact_phone', 'service_email']
 
 
