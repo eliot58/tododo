@@ -3,6 +3,7 @@ from .models import *
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
+    search_fields = ("fio", "email")
     list_display = ['fio', 'spec', 'email', 'phone_number', 'date_joined']
 
     @admin.display(ordering='user__date_joined', description='дата регистрации')
@@ -11,10 +12,12 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Diler)
 class DilerAdmin(admin.ModelAdmin):
+    search_fields = ("user", )
     list_display = ['user', 'organization', 'warehouse_address', 'region', 'practice']
 
 @admin.register(Provider)
 class ProviderAdmin(admin.ModelAdmin):
+    search_fields = ("user", )
     list_display = ['user', 'company', 'product_address', 'contact_phone', 'service_email']
 
 
