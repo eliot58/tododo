@@ -22,20 +22,23 @@
                 <a id="close__modal" href="{% url 'dil_save' %}" class="btn main__btn rating__btn">Мой профиль</a>
             </div>
         </div>
-        <div class="popup-fade" id="open__modal">
-            <div class="popup">
+        <div class="popup-review" id="open__modal">
+            <form class="popup" method="post" action="{% url 'diler_review' %}">
+                {% csrf_token %}
                 <h3>Оцените работу поставщика</h3>
                 <h1>ДомКом</h1>
+                <input type="text" name="to" class="to" hidden>
                 <div class="popup-rating">
                     <div class="rating-text">
                         <p>Качество продукции</p>
                     </div>
                     <div class="rating-mini">
-                        <span class="active"></span>
-                        <span class="active"></span>
-                        <span class="active"></span>
-                        <span class="active"></span>
-                        <span class="active"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <input type="text" name="product_quality" class="product_quality" value="0" hidden>
                     </div>
                 </div>
                 <div class="popup-rating">
@@ -43,11 +46,12 @@
                         <p>Качество доставки</p>
                     </div>
                     <div class="rating-mini">
-                        <span class="active"></span>
-                        <span class="active"></span>
-                        <span class="active"></span>
-                        <span></span>
-                        <span></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <input type="text" name="delivery_quality" class="delivery_quality" value="0" hidden>
                     </div>
                 </div>
                 <div class="popup-rating">
@@ -55,15 +59,16 @@
                         <p>Лояльность поставщика</p>
                     </div>
                     <div class="rating-mini">
-                        <span class="active"></span>
-                        <span class="active"></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <span class="star"></span>
+                        <input type="text" name="supplier_loyalty" class="supplier_loyalty" value="0" hidden>
                     </div>
                 </div>
-                <button id="next__modal" class="btn main__btn rating__btn">Оставить отзыв</button>
-            </div>
+                <button type="submit" id="next__modal" class="btn main__btn rating__btn">Оставить отзыв</button>
+            </form>
         </div>
         <div class="popup-fade" id="send__modal">
             <div class="popup">
@@ -156,7 +161,7 @@
                             <td>{{ quantity.order.implement.data }}</td>
                             <td>{{ quantity.order.address }}</td>
                             <td>
-                                <a href="" class="response">Оставить отзыв</a>
+                                <button type="button" {% if quantity.author.id in send_review %} disabled {% endif %} onclick="createReview('{{quantity.author.company}}', '{{quantity.author.id}}')" class="response">{% if quantity.author.id in send_review %}Отзыв оставлен{% else %}Оставить отзыв{% endif %}</button>
                             </td>
                         </tr>
                         {% endif %}
@@ -173,12 +178,12 @@
             <div class="mb__nav-btns">
                 <div class="btn">
                     <span class="android"></span>
-                    <a class="btn-link" href="/apk/app-release.apk">Вход для Android</a>
+                    <a class="btn-link" href="https://play.google.com/store/apps/details?id=ru.todotodo.apk">Google Play</a>
                 </div>
-                <div class="btn">
+                <!-- <div class="btn">
                     <span class="ios"></span>
-                    <a class="btn-link" href="#">Вход для IOS</a>
-                </div>
+                    <a class="btn-link" href="#">App Store</a>
+                </div> -->
             </div>
             <div class="mb__navbar">
                 <div class="mb__nav-logo">
@@ -229,17 +234,6 @@
                 </div>
             </div>
         </div>
-        <div class="mb__download">
-            <div class="mb__download-intro">
-                <h1>Скачай совершенно
-                    бесплатно</h1>
-                <div class="mb__download-btn">
-                    <a href="#"><img src="{% static 'assets/img/app-store.svg' %}" alt="app-store"></a>
-                    <a href="#"><img src="{% static 'assets/img/google-play.svg' %}" alt="google-play"></a>
-                </div>
-            </div>
-            <img src="{% static 'assets/img/hand.svg' %}" alt="hand" class="mb__img">
-        </div>
         <div class="mb__footer">
             <div class="mb__footer-content">
                 <div class="mb__footer-intro">
@@ -258,24 +252,7 @@
         </div>
     </div>
     <script>
-        function checkProfile() {
-        let data = {};
-        data = JSON.stringify(data);
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "/diler/check");
-        xhr.responseType = 'json';
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(data);
-        xhr.onload = () => {
-            if (xhr.status == 200) {
-            if (xhr.response['res']) {
-                window.location.pathname = '{% url "order_save" %}';
-            } else {
-                document.querySelector('.popup-profile-page').style.display = 'block';
-            }
-            }
-        }
-        }
+    function checkProfile(){let s={};s=JSON.stringify(s);let a=new XMLHttpRequest;a.open("POST","/diler/check"),a.responseType="json",a.setRequestHeader("Content-Type","application/json"),a.send(s),a.onload=()=>{200==a.status&&(a.response.res?window.location.pathname='{% url "order_save" %}':document.querySelector(".popup-profile-page").style.display="block")}}function createReview(s,a){document.querySelector(".popup-review h1").innerHTML=s,document.querySelector(".to").value=a,document.querySelector(".popup-review").style.display="block"}const star=document.querySelectorAll(".star");star[0].addEventListener("click",function(){star[0].classList.add("active"),star[1].classList.remove("active"),star[2].classList.remove("active"),star[3].classList.remove("active"),star[4].classList.remove("active"),document.querySelector(".product_quality").value=1}),star[1].addEventListener("click",function(){star[0].classList.add("active"),star[1].classList.add("active"),star[2].classList.remove("active"),star[3].classList.remove("active"),star[4].classList.remove("active"),document.querySelector(".product_quality").value=2}),star[2].addEventListener("click",function(){star[0].classList.add("active"),star[1].classList.add("active"),star[2].classList.add("active"),star[3].classList.remove("active"),star[4].classList.remove("active"),document.querySelector(".product_quality").value=3}),star[3].addEventListener("click",function(){star[0].classList.add("active"),star[1].classList.add("active"),star[2].classList.add("active"),star[3].classList.add("active"),star[4].classList.remove("active"),document.querySelector(".product_quality").value=4}),star[4].addEventListener("click",function(){star[0].classList.add("active"),star[1].classList.add("active"),star[2].classList.add("active"),star[3].classList.add("active"),star[4].classList.add("active"),document.querySelector(".product_quality").value=5}),star[5].addEventListener("click",function(){star[5].classList.add("active"),star[6].classList.remove("active"),star[7].classList.remove("active"),star[8].classList.remove("active"),star[9].classList.remove("active"),document.querySelector(".delivery_quality").value=1}),star[6].addEventListener("click",function(){star[5].classList.add("active"),star[6].classList.add("active"),star[7].classList.remove("active"),star[8].classList.remove("active"),star[9].classList.remove("active"),document.querySelector(".delivery_quality").value=2}),star[7].addEventListener("click",function(){star[5].classList.add("active"),star[6].classList.add("active"),star[7].classList.add("active"),star[8].classList.remove("active"),star[9].classList.remove("active"),document.querySelector(".delivery_quality").value=3}),star[8].addEventListener("click",function(){star[5].classList.add("active"),star[6].classList.add("active"),star[7].classList.add("active"),star[8].classList.add("active"),star[9].classList.remove("active"),document.querySelector(".delivery_quality").value=4}),star[9].addEventListener("click",function(){star[5].classList.add("active"),star[6].classList.add("active"),star[7].classList.add("active"),star[8].classList.add("active"),star[9].classList.add("active"),document.querySelector(".delivery_quality").value=5}),star[10].addEventListener("click",function(){star[10].classList.add("active"),star[11].classList.remove("active"),star[12].classList.remove("active"),star[13].classList.remove("active"),star[14].classList.remove("active"),document.querySelector(".supplier_loyalty").value=1}),star[11].addEventListener("click",function(){star[10].classList.add("active"),star[11].classList.add("active"),star[12].classList.remove("active"),star[13].classList.remove("active"),star[14].classList.remove("active"),document.querySelector(".supplier_loyalty").value=2}),star[12].addEventListener("click",function(){star[10].classList.add("active"),star[11].classList.add("active"),star[12].classList.add("active"),star[13].classList.remove("active"),star[14].classList.remove("active"),document.querySelector(".supplier_loyalty").value=3}),star[13].addEventListener("click",function(){star[10].classList.add("active"),star[11].classList.add("active"),star[12].classList.add("active"),star[13].classList.add("active"),star[14].classList.remove("active"),document.querySelector(".supplier_loyalty").value=4}),star[14].addEventListener("click",function(){star[10].classList.add("active"),star[11].classList.add("active"),star[12].classList.add("active"),star[13].classList.add("active"),star[14].classList.add("active"),document.querySelector(".supplier_loyalty").value=5});
     </script>
     <script>
         window.replainSettings = { id: 'e0e3e15f-5e92-4a18-b1fc-cd3da63621ce' };

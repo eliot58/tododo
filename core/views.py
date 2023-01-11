@@ -322,7 +322,9 @@ def diler_work(request):
 @login_required(login_url='/login/')
 def diler_archive(request):
     if request.user.profile.spec == 'D':
-        return render(request, 'diler/archive-diler.html', {'orders': request.user.profile.diler.order_set.all()})
+        review = Review.objects.filter(fr_id=request.user.profile.diler)
+        to = list(map(lambda item: item.to.id, review))
+        return render(request, 'diler/archive-diler.html', {'orders': request.user.profile.diler.order_set.all(),'send_review': to})
     else:
         return HttpResponseForbidden()
     
@@ -331,7 +333,8 @@ def diler_archive(request):
 def company_card(request, id):
     if request.user.profile.spec == 'D':
         p = Provider.objects.get(id=id)
-        return render(request, 'diler/company-profile.html', {'provider': p})
+        reviews = Review.objects.filter(to_id=id)
+        return render(request, 'diler/company-profile.html', {'provider': p, 'reviews': reviews})
     else:
         return HttpResponseForbidden()
 
@@ -381,7 +384,7 @@ def provider_check(request, id):
 def diler_review(request):
     if request.user.profile.spec == 'D':
         r = Review()
-        r.to_id = int(request.POST.getlist('review')[-1])
+        r.to_id = int(request.POST['to'])
         r.fr = request.user.profile.diler
         r.product_quality = int(request.POST['product_quality'])
         r.delivery_quality = int(request.POST['delivery_quality'])

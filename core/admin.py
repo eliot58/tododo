@@ -63,3 +63,6 @@ class ImplementAdmin(admin.ModelAdmin):
 class ImplementAdmin(admin.ModelAdmin):
     list_display = ['title', 'price', 'description']
 
+
+admin.site.register(Review)
+
