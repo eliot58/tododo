@@ -113,9 +113,9 @@ def sign_up(request):
     spec = 'Дилер' if request.data['spec']=='D' else 'Поставщик окон'
     p = Profile.objects.create(user=new_user,fio=request.data['fio'],spec=request.data['spec'],email=request.data['email'],phone_number=request.data['phone'])
     if request.data['spec']=='D':
-        Diler.objects.create(user=p, date_last_auth = datetime.datetime.utcnow().replace(tzinfo=utc))
+        Diler.objects.create(user=p)
     else:
-        Provider.objects.create(user=p, date_last_auth = datetime.datetime.utcnow().replace(tzinfo=utc))
+        Provider.objects.create(user=p)
 
     msg = 'Вы зарегистрировались как ' + spec + '\n' + 'Ваш login: ' + request.data['email'] + '\n' + 'Ваш password: ' + password
     try:
