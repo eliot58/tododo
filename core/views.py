@@ -57,11 +57,23 @@ def signup(request):
             new_user.set_password(password)
             new_user.save()
             spec = 'Дилер' if request.POST['spec']=='D' else 'Поставщик окон'
-            p = Profile.objects.create(user=new_user,fio=cd['fio'],spec=request.POST['spec'],email=cd['email'],phone_number=cd['phone'])
+            try:
+                p = Profile.objects.create(user=new_user,fio=cd['fio'],spec=request.POST['spec'],email=cd['email'],phone_number=cd['phone'])
+            except:
+                new_user.delete()
+                return render(request, 'auth/lose_register.html')
             if request.POST['spec']=='D':
-                Diler.objects.create(user=p)
+                try:
+                    Diler.objects.create(user=p)
+                except:
+                    new_user.delete()
+                    return render(request, 'auth/lose_register.html')
             else:
-                Provider.objects.create(user=p)
+                try:
+                    Provider.objects.create(user=p)
+                except:
+                    new_user.delete()
+                    return render(request, 'auth/lose_register.html')
 
             msg = 'Вы зарегистрировались как ' + spec + '\n' + 'Ваш login: ' + request.POST['email'] + '\n' + 'Ваш password: ' + password
             try:

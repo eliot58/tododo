@@ -111,11 +111,23 @@ def sign_up(request):
     new_user.set_password(password)
     new_user.save()
     spec = 'Дилер' if request.data['spec']=='D' else 'Поставщик окон'
-    p = Profile.objects.create(user=new_user,fio=request.data['fio'],spec=request.data['spec'],email=request.data['email'],phone_number=request.data['phone'])
+    try:
+        p = Profile.objects.create(user=new_user,fio=request.data['fio'],spec=request.data['spec'],email=request.data['email'],phone_number=request.data['phone'])
+    except:
+        new_user.delete()
+        return Response({'success': False})
     if request.data['spec']=='D':
-        Diler.objects.create(user=p)
+        try:
+            Diler.objects.create(user=p)
+        except:
+            new_user.delete()
+            return Response({'success': False})
     else:
-        Provider.objects.create(user=p)
+        try:
+            Provider.objects.create(user=p)
+        except:
+            new_user.delete()
+            return Response({'success': False})
 
     msg = 'Вы зарегистрировались как ' + spec + '\n' + 'Ваш login: ' + request.data['email'] + '\n' + 'Ваш password: ' + password
     try:
