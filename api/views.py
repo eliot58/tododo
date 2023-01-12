@@ -98,7 +98,7 @@ def balance(request):
             d['title'] = ps.title
             d['price'] = ps.price
             d['description'] = ps.description
-        return Response(p)
+    return Response(d)
 
 @api_view(["GET"])
 def send_quantity(request):
