@@ -1,5 +1,5 @@
 import patoolib
-from core.models import Order, Shape, Implement, Region, Profile, Diler, Provider, Quantity, Review
+from core.models import Order, Price, Shape, Implement, Region, Profile, Diler, Provider, Quantity, Review
 from .serializers import *
 from django.core.mail import send_mail
 from rest_framework import views
@@ -77,6 +77,22 @@ def isblanked(request):
     if request.user.profile.diler.organization == '' or request.user.profile.diler.warehouse_address == '' or request.user.profile.diler.region == None:
         flag = True
     return Response({'isblanked': flag})
+
+
+@api_view(["GET"])
+def provider_check(request):
+    if request.user.profile.spec == 'P':
+        o = Quantity.objects.get(id=id)
+        if o.author_id == request.user.profile.provider.id:
+            o.order.isactive = False
+            o.order.save()
+    return Response({'success': True})
+
+
+@api_view(["GET"])
+def balance(request):
+    if request.user.profile.spec == 'P':
+        return Response(Price.objects.all())
 
 @api_view(["GET"])
 def send_quantity(request):
@@ -589,12 +605,20 @@ class GetProvider(views.APIView):
 
 
 class Review(views.APIView):
-    def get(self, request):
-        pass
-
+    def get(self, request, id):
+        reviews = Review.objects.filter(to_id=id)
+        return Response(reviews)
 
     def post(self, request):
-        pass
+        if request.user.profile.spec == 'D':
+            r = Review()
+            r.to_id = int(request.POST['to'])
+            r.fr = request.user.profile.diler
+            r.product_quality = int(request.POST['product_quality'])
+            r.delivery_quality = int(request.POST['delivery_quality'])
+            r.supplier_loyalty = int(request.POST['supplier_loyalty'])
+            r.save()
+        return Response({'success': True})
 
 @api_view(['POST'])
 def savephonelist(request):
