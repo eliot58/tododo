@@ -92,7 +92,13 @@ def provider_check(request):
 @api_view(["GET"])
 def balance(request):
     if request.user.profile.spec == 'P':
-        return Response(Price.objects.all())
+        d = {}
+        p = Price.objects.all()
+        for ps in p:
+            d['title'] = ps.title
+            d['price'] = ps.price
+            d['description'] = ps.description
+        return Response(p)
 
 @api_view(["GET"])
 def send_quantity(request):
