@@ -20,6 +20,6 @@ urlpatterns = [
     path('send_quantity/', send_quantity),
     path('quatitydel/<int:id>/', QuantityDel.as_view()),
     path('savephonelist/', savephonelist),
-    path('provider_check/', provider_check),
+    path('provider_check/<int:id>/', provider_check),
     path('balance/', balance)
 ]

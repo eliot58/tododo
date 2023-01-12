@@ -80,7 +80,7 @@ def isblanked(request):
 
 
 @api_view(["GET"])
-def provider_check(request):
+def provider_check(request, id):
     if request.user.profile.spec == 'P':
         o = Quantity.objects.get(id=id)
         if o.author_id == request.user.profile.provider.id:
