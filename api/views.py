@@ -615,11 +615,7 @@ class GetProvider(views.APIView):
         return Response(d)
 
 
-class Review(views.APIView):
-    def get(self, request, id):
-        reviews = Review.objects.filter(to_id=id)
-        return Response(reviews)
-
+class Reviews(views.APIView):
     def post(self, request):
         if request.user.profile.spec == 'D':
             r = Review()

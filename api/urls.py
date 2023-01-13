@@ -21,5 +21,6 @@ urlpatterns = [
     path('quatitydel/<int:id>/', QuantityDel.as_view()),
     path('savephonelist/', savephonelist),
     path('provider_check/<int:id>/', provider_check),
-    path('balance/', balance)
+    path('balance/', balance),
+    path('review/', Reviews.as_view())
 ]
