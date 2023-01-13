@@ -619,11 +619,11 @@ class Reviews(views.APIView):
     def post(self, request):
         if request.user.profile.spec == 'D':
             r = Review()
-            r.to_id = int(request.POST['to'])
+            r.to_id = int(request.data['to'])
             r.fr = request.user.profile.diler
-            r.product_quality = int(request.POST['product_quality'])
-            r.delivery_quality = int(request.POST['delivery_quality'])
-            r.supplier_loyalty = int(request.POST['supplier_loyalty'])
+            r.product_quality = int(request.data['product_quality'])
+            r.delivery_quality = int(request.data['delivery_quality'])
+            r.supplier_loyalty = int(request.data['supplier_loyalty'])
             r.save()
         return Response({'success': True})
 
