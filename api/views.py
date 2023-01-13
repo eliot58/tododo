@@ -303,6 +303,8 @@ class WorkList(views.APIView):
 class ArchiveList(views.APIView):
     def get(self, request):
         if request.user.profile.spec == 'D':
+            review = Review.objects.filter(fr_id=request.user.profile.diler)
+            to = list(map(lambda item: item.to.id, review))
             archive = []
             for order in request.user.profile.diler.order_set.all():
                 for quantity in order.quantity_set.all():
@@ -317,6 +319,7 @@ class ArchiveList(views.APIView):
                         d['address'] = quantity.order.address
                         d['author_id'] = quantity.author.id
                         d['author_company'] = quantity.author.company
+                        d['isreview'] = quantity.author.id in to
                         archive.append(d)
             archive = sorted(archive, key=lambda item: item['id'], reverse=True)
             
