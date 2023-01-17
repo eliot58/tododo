@@ -73,7 +73,7 @@
                             <th>Оплата</th>
                             <th>Доставка</th>
                             <th>Желаемая цена</th>
-                            <th>Заказ дилера</th>
+                            <!-- <th>Заказ дилера</th> -->
                         </tr>
                         {% for quantity in quantitys %}
                         {% if quantity.order.isactive %}
@@ -96,7 +96,7 @@
                             <td>Самовывоз</td>
                             {% endif %}
                             <td>{{ quantity.order.price }}</td>
-                            <td>
+                            <!-- <td>
                                 <div id="accordeon" class="acc__container">
                                     <div class="acc__head">
                                         {{ quantity.order.user.user.fio }}
@@ -108,7 +108,7 @@
                                         <p>{{ quantity.price }}</p>
                                     </div>
                                 </div>
-                            </td>
+                            </td> -->
                         </tr>
                         {% endif %}
                         {% endfor %}

@@ -92,16 +92,19 @@
                             <input type="tel" required value="{{ request.user.profile.provider.service_phone }}" class="account__input col" placeholder="Контактный телефон" name="service_phone">
                             <input type="email" required value="{{ request.user.profile.provider.service_email }}" class="account__input col" placeholder="e-mail" name="service_email">
                         </div>
+                        <p style="margin-left: 10px; font-size: 18px;">Профили</p>
                         <select multiple="multiple" class="account__input multi__select" name="shapes" id="profile__select">
                             {% for shape in shapes %}
                             <option value="{{ shape.id }}" {% if shape in request.user.profile.provider.shapes.all %} selected {% endif %}>{{ shape.data }}</option>
                             {% endfor %}
                         </select>
+                        <p style="margin-left: 10px; font-size: 18px;">Фурнитуры</p>
                         <select multiple="multiple" class="account__input multi__select" name="implements" id="profile__select">
                             {% for implement in implements %}
                             <option value="{{ implement.id }}" {% if implement in request.user.profile.provider.implements.all %} selected {% endif %}>{{ implement.data }}</option>
                             {% endfor %}
                         </select>
+                        <p style="margin-left: 10px; font-size: 18px;">Регионы</p>
                         <select multiple="multiple" class="account__input multi__select" name="regions" id="profile__select">
                             {% for region in regions %}
                             <option value="{{ region.id }}" {% if region in request.user.profile.provider.regions.all %} selected {% endif %}>{{ region.data }}</option>
