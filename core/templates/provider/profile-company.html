@@ -111,7 +111,7 @@
                             {% endfor %}
                         </select>
                         <textarea name="description" required class="account__input" cols="10" rows="3" placeholder="О компании">{{ request.user.profile.provider.description }}</textarea>
-                        <button type="submit" class="form__btn main__btn mt-3 mb-3 mx-auto pl-3 d-flex">Подтвердить</button>
+                        <button onclick="saveProfile()" class="form__btn main__btn mt-3 mb-3 mx-auto pl-3 d-flex">Подтвердить</button>
                     </form>
                 </div>
             </div>
@@ -214,6 +214,9 @@
               "url(" + URL.createObjectURL(file) + ") 0 0/100% 100% no-repeat";
           }
         };
+        function saveProfile(){
+            document.querySelector('.form').submit();
+        }
     </script>
     <script>
         window.replainSettings = { id: 'e0e3e15f-5e92-4a18-b1fc-cd3da63621ce' };
