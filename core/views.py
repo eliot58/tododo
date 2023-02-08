@@ -13,7 +13,6 @@ from django.core.files import File
 from pathlib import Path
 import patoolib
 import os
-from django.utils.timezone import utc
 from django.views.decorators.csrf import csrf_exempt
 import logging
 from .tasks import *
@@ -23,6 +22,9 @@ logger = logging.getLogger('django')
 
 #LOGIN REGISTER LOGOUT
 #============================================================================
+
+
+
 def login_view(request):
     if request.method == 'POST':
         login_form = LoginForm(request.POST)
@@ -57,23 +59,11 @@ def signup(request):
             new_user.set_password(password)
             new_user.save()
             spec = 'Дилер' if request.POST['spec']=='D' else 'Поставщик окон'
-            try:
-                p = Profile.objects.create(user=new_user,fio=cd['fio'],spec=request.POST['spec'],email=cd['email'],phone_number=cd['phone'])
-            except:
-                new_user.delete()
-                return render(request, 'auth/lose_register.html')
+            p = Profile.objects.create(user=new_user,fio=cd['fio'],spec=request.POST['spec'],email=cd['email'],phone_number=cd['phone'])
             if request.POST['spec']=='D':
-                try:
-                    Diler.objects.create(user=p)
-                except:
-                    new_user.delete()
-                    return render(request, 'auth/lose_register.html')
+                Diler.objects.create(user=p)
             else:
-                try:
-                    Provider.objects.create(user=p)
-                except:
-                    new_user.delete()
-                    return render(request, 'auth/lose_register.html')
+                Provider.objects.create(user=p)
 
             msg = 'Вы зарегистрировались как ' + spec + '\n' + 'Ваш login: ' + request.POST['email'] + '\n' + 'Ваш password: ' + password
             try:

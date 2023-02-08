@@ -4,9 +4,8 @@ import string
 lower = string.ascii_lowercase
 upper = string.ascii_uppercase
 num = string.digits
-symbols = string.punctuation
 
-all = lower + upper + num + symbols
+all = lower + upper + num
 
 
 def generator(length):

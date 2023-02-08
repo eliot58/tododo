@@ -22,7 +22,7 @@ def sendmass(id, isdiler):
                 msg = provider.company + '\n' + f'Вернитесь в сервис дилеры-окон.рф, появился новый расчёт https://xn----gtbdlmdrgbq5j.xn--p1ai/provider/response/{id}' + '\n' + 'Вы получили это сообщение, потому что были зарегистрированы на сайте дилеры-окон.рф' + '\n' + 'Если Вы не хотите получать это сообщение, то его можно отключить в разделе профиля'
                 send_mail('Новый расчёт', msg, settings.EMAIL_HOST_USER, [provider.service_email], fail_silently=False)
     else:
-        m = f'Зарегестрировался новый поставщик окон https://xn----gtbdlmdrgbq5j.xn--p1ai/diler/company/card/{p.id}, попробуйте разместить заказ и узнайте цену поставщика https://xn----gtbdlmdrgbq5j.xn--p1ai/diler/company/card/{p.id}'
+        m = f'Зарегестрировался новый поставщик окон https://xn----gtbdlmdrgbq5j.xn--p1ai/diler/company/card/{id}, попробуйте разместить заказ и узнайте цену поставщика https://xn----gtbdlmdrgbq5j.xn--p1ai/diler/company/card/{id}'
         try:
             requests.post('https://api.telegram.org/bot5852658863:AAHezP9l75ukvpQHSD3Bt5x24kMETAeqDfY/sendMessage', json={'chat_id': '-1001881532635', 'text': m})
             requests.post('https://api.telegram.org/bot5852658863:AAHezP9l75ukvpQHSD3Bt5x24kMETAeqDfY/sendMessage', json={'chat_id': '-1001486998352', 'text': m})

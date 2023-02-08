@@ -37,14 +37,14 @@ class Implement(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Аккаунт')
-    fio = models.CharField(max_length=400, verbose_name='ФИО')
+    fio = models.CharField(max_length=100, verbose_name='ФИО')
     ch = [
         ('D', 'Дилер'),
         ('P', 'Поставщик окон')
     ]
     spec = models.CharField(max_length=9, choices=ch, verbose_name='Спец')
     email = models.EmailField(primary_key=True, verbose_name='Почта')
-    phone_number = models.CharField(max_length=20, unique=True, verbose_name='Телефон')
+    phone_number = models.CharField(max_length=12, unique=True, verbose_name='Телефон')
 
     class Meta:
         verbose_name = 'Аккаунт'
@@ -78,9 +78,9 @@ class Provider(models.Model):
     legal_entity = models.CharField(max_length=200, default='', verbose_name='Юридическое лицо')
     product_address = models.CharField(max_length=200, default='', verbose_name='Адрес производства')
     contact_entity = models.CharField(max_length=200, default='', verbose_name='Руководитель')
-    contact_phone = models.CharField(default='', max_length=200, verbose_name='Телефон производства')
+    contact_phone = models.CharField(default='', max_length=12, verbose_name='Телефон производства')
     service_entity = models.CharField(max_length=200, default='', verbose_name='Менеджер')
-    service_phone = models.CharField(default='',max_length=200, verbose_name='Контактный телефон')
+    service_phone = models.CharField(default='',max_length=12, verbose_name='Контактный телефон')
     service_email = models.EmailField(default='', verbose_name='E-mail')
     shapes = models.ManyToManyField(Shape, verbose_name='Профили')
     regions = models.ManyToManyField(Region, verbose_name='Регионы')
@@ -129,6 +129,7 @@ class Order(models.Model):
     file = models.FileField(upload_to='diler/order/files')
     isactive = models.BooleanField(default=True)
 
+
     def filename(self):
         return os.path.basename(self.file.name)
 
@@ -150,6 +151,7 @@ class Quantity(models.Model):
     file = models.FileField(upload_to='providers/quantity/files')
     comment = models.TextField(null=True)
     isresponse = models.BooleanField(default=False)
+
 
     def filename(self):
         return os.path.basename(self.file.name)

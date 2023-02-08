@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_yasg',
     'core',
     'rest_framework',
     'rest_framework.authtoken',
@@ -141,8 +142,18 @@ else:
     STATIC_ROOT = '/var/www/tododo/static'
     STATIC_URL = '/static/'
 
-APK_ROOT = os.path.join(BASE_DIR, "apk/")
-APK_URL = '/apk/'
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {
+        'DRF Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+}
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -156,6 +167,8 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+TOKEN_EXPIRED_AFTER_SECONDS = 60 * 60 * 48
 
 
 PASSWORD_HASHERS = [
@@ -198,8 +211,11 @@ LOGGING = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+        'api.authentication.ExpiringTokenAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
 }
 
 

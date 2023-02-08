@@ -55,10 +55,10 @@ class LoginForm(forms.Form):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            raise ValidationError('Пользователь с таким логином не существует')
+            raise ValidationError('Неверный email или пароль')
         else:
             if not(check_password(password, user.password)):
-                raise ValidationError('Пароль не верный')
+                raise ValidationError('Неверный email или пароль')
         return password
                 
         
