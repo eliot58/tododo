@@ -31,7 +31,7 @@ class ProfileForm(forms.Form):
     
     def clean_phone(self):
         phone = self.cleaned_data['phone']
-        regx = re.match(r'^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$',phone)
+        regx = re.match(r'^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$', phone)
         try:
             regx.start()
         except AttributeError:

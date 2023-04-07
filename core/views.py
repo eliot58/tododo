@@ -266,7 +266,6 @@ def provider_response(request, id):
     else:
         return HttpResponseForbidden()
 
-
 @login_required(login_url='/login/')
 def provider_work(request):
     return render(request, 'provider/processed-company.html', {'quantitys': request.user.profile.provider.quantity_set.all()})

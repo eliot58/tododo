@@ -181,32 +181,32 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 
 FILE_UPLOAD_HANDLERS = ['django.core.files.uploadhandler.TemporaryFileUploadHandler']
 
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{asctime} {levelname} {module} {message}',
-            'style': '{',
-        }
-    },
-    'handlers': {
-        'file': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
-            'formatter': 'verbose'
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{asctime} {levelname} {module} {message}',
+                'style': '{',
+            }
         },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'WARNING',
-            'propagate': True,
+        'handlers': {
+            'file': {
+                'level': 'WARNING',
+                'class': 'logging.FileHandler',
+                'filename': 'debug.log',
+                'formatter': 'verbose'
+            },
         },
-    },
-}
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'WARNING',
+                'propagate': True,
+            },
+        },
+    }
 
 
 REST_FRAMEWORK = {

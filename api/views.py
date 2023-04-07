@@ -6,6 +6,8 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
     HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_403_FORBIDDEN
 )
 from rest_framework.response import Response
 
@@ -21,10 +23,15 @@ from rest_framework import generics, views
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.db.models import Q
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.decorators import parser_classes
 
+from django.core.files import File
+from pathlib import Path
+import patoolib
 
-class DilerSave:
-    def __init__(self, logo, organization, warehouse_address, region, regions, fullName, email, phone):
+class DilerClass:
+    def __init__(self, logo, organization, warehouse_address, region, regions, fullName, email, phone, practice):
         self.logo  = logo
         self.organization = organization
         self.warehouse_address = warehouse_address
@@ -33,6 +40,7 @@ class DilerSave:
         self.fullName = fullName
         self.email = email
         self.phone = phone
+        self.practice = practice
 
 
 @swagger_auto_schema(method='post',request_body=UserSigninSerializer)
@@ -50,11 +58,13 @@ def signin(request):
     )
     if not user:
         return Response({'detail': 'Invalid Credentials or activate account'}, status=HTTP_404_NOT_FOUND)
+
         
     token, _ = Token.objects.get_or_create(user = user)
 
     return Response({
         'token': token.key,
+        'spec': user.profile.spec
     }, status=HTTP_200_OK)
 
 @swagger_auto_schema(method='post',request_body=UserSignupSerializer)
@@ -62,7 +72,7 @@ def signin(request):
 @permission_classes((AllowAny,))
 def signup(request):
     serializer = UserSignupSerializer(data = request.data)
-    if not serializer.is_valid():
+    if not serializer.is_valid(raise_exception=True):
         return Response(serializer.errors, status = HTTP_400_BAD_REQUEST)
 
     password = generator(8)
@@ -86,7 +96,7 @@ def signup(request):
     msg = 'Вы зарегистрировались как ' + spec + '\n' + 'Ваш login: ' + serializer.data['email'] + '\n' + 'Ваш password: ' + password
     try:
         send_mail('Регистрация в todotodo', msg, settings.EMAIL_HOST_USER, [serializer.data['email']], fail_silently=False)
-        newuser(f'В сервис зарегистрировался новый {spec.lower()}: {serializer.data["fullName"]}, подробнее в дилеры-окон.рф')
+        # newuser(f'В сервис зарегистрировался новый {spec.lower()}: {serializer.data["fullName"]}, подробнее в дилеры-окон.рф')
     except:
         new_user.delete()
         return Response({'detail': 'Invalid Credentials'}, status=HTTP_400_BAD_REQUEST)
@@ -106,59 +116,85 @@ def isblank(request):
         return Response({'isblanked': False})
     return Response({'isblanked': True})
 
-
-class ProfileUpdate(generics.UpdateAPIView):
-    serializer_class = ProfileSerializer
-
-class DilerProfile(views.APIView):
-
+@api_view(['GET'])
+def isdiler(request):
+    return Response({"success": True if request.user.profile.spec == 'D' else False})
+    
+class DilerProfileView(views.APIView):
     def get(self, request):
-        profile = request.user.profile
-        diler = DilerSave(profile.diler.logo, profile.diler.organization, profile.diler.warehouse_address, profile.diler.region, Region.objects.all(), profile.fio, profile.email, profile.phone_number)
+        diler = DilerClass(request.user.profile.diler.logo, request.user.profile.diler.organization, request.user.profile.diler.warehouse_address, request.user.profile.diler.region_id, Region.objects.all(), request.user.profile.fio, request.user.profile.email, request.user.profile.phone_number, request.user.profile.diler.practice)
         serializer = DilerSerializer(diler)
         return Response(serializer.data, status=HTTP_200_OK)
+        
 
-    @swagger_auto_schema(request_body=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'logo': openapi.Schema(type=openapi.TYPE_FILE, description='Логотип'),
-                            'organization': openapi.Schema(type=openapi.TYPE_STRING, description='Организация'),
-                            'warehouse_address': openapi.Schema(type=openapi.TYPE_STRING, description='Адрес склада'),
-                            'region': openapi.Schema(type=openapi.TYPE_INTEGER, description='Регион'),
-                        }))
-    def patch(self, request):
-        serializer = DilerSerializer(instance = request.user.profile.diler,data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+    @swagger_auto_schema(request_body=DilerSerializer)
+    def put(self, request):
+        serializer = DilerSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = request.user
+            user.profile.fio = serializer.data["fullName"]
+            user.profile.phone_number = serializer.data['phone']
+            user.profile.email = serializer.data['email']
+            user.profile.save()
+            user.profile.diler.organization = serializer.data['organization']
+            user.profile.diler.warehouse_address = serializer.data['warehouse_address']
+            try:
+                user.profile.diler.logo = serializer.data['logo']
+            except KeyError:
+                pass
+            user.profile.diler.region_id = serializer.data['region']
+            user.profile.diler.save()
+            return Response(serializer.data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
-class ProviderProfile(views.APIView):
-
+class ProviderProfileView(views.APIView):
     def get(self, request):
-        serializer = ProviderSerializer(request.user.profile.provider)
+        serializer = ProviderSerialiazer(request.user.profile.provider)
         return Response(serializer.data, status=HTTP_200_OK)
+    
 
-    @swagger_auto_schema(request_body=ProviderSerializer)
-    def patch(self, request):
-        serializer = ProviderSerializer(instance=request.user.profile.provider, data=request.data, partial=True)
-        if serializer.is_valid():
+    @swagger_auto_schema(request_body=ProviderSerialiazer)
+    def put(self, request):
+        serializer = ProviderSerialiazer(instance=request.user.profile.provider, data=request.data)
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-    
-        
+
 class OrderView(views.APIView):
-    
+    @swagger_auto_schema(manual_parameters=[openapi.Parameter('id', openapi.IN_PATH, description="post id", type=openapi.TYPE_INTEGER)])
     def get(self, request, *args, **kwargs):
-        
         try:
             serializer = OrdersSerializer(Order.objects.get(id=kwargs['pk']))
         except Order.DoesNotExist:
             return Response({'error': 'Order does not exist'}, status=HTTP_404_NOT_FOUND)
         return Response(serializer.data)
+
+    @swagger_auto_schema(request_body=OrderCreateSerializer)
+    def post(self, request):
+        if request.user.profile.spec == 'D':
+            serializer = OrderCreateSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                user = request.user
+                order = user.profile.diler.order_set.create(shape_id=request.data['shape'],implement_id=request.data['implement'],address=request.data['address'], type_pay=request.data['type_pay'], type_delivery=request.data['type_delivery'], amount_window=int(request.data['amount_window']), price=request.data['price'], comment=request.data['comment'])
+                files = request.FILES.getlist('file')
+                f = []
+                os.system('rm -rf scetch.zip')
+                for file in files:
+                    print(file)
+                    f.append(file.temporary_file_path())
+                os.system('rm -rf scetch.zip')
+                patoolib.create_archive('scetch.zip',f)
+                path = Path('scetch.zip')
+                with path.open(mode='rb') as f:
+                    order.file = File(f,name=path.name)
+                    order.save()
+                os.system('rm -rf scetch.zip')
+                return Response(status=HTTP_201_CREATED)
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        return Response(status=HTTP_403_FORBIDDEN)
 
 
     @swagger_auto_schema(request_body=openapi.Schema(
@@ -177,17 +213,14 @@ class OrderView(views.APIView):
             return Response(serializer.data, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-
-
 class OrdersView(views.APIView):
-
     def get(self, request):
         if request.user.profile.spec == 'D':
             serializer = OrdersSerializer(Order.objects.filter(isactive=True), many = True)
             return Response(serializer.data)
-        serializer = OrdersSerializer(Order.objects.filter(user__region__in=request.user.profile.provider.regions.all()))
+        serializer = OrdersSerializer(Order.objects.filter(user__region__in=request.user.profile.provider.regions.all()), many=True)
         return Response(serializer.data)
-
+    
 
 class QuantityView(views.APIView):
 
@@ -202,7 +235,6 @@ class QuantityView(views.APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-        
     
 
 
@@ -220,32 +252,7 @@ class WorkList(views.APIView):
     
     def get(self, request):
         if request.user.profile.spec == 'D':
-            serializer = QuantitySerializer(Quantity.objects.filter(Quantity.objects.filter(Q(order__user__id=request.user.profile.diler.id) & Q(isresponse=True) & Q(order__isactive=True))), many=True)
+            serializer = QuantitySerializer(Quantity.objects.filter(Q(order__user__id=request.user.profile.diler.id) & Q(isresponse=True) & Q(order__isactive=True)), many=True)
             return Response(serializer.data)
-        serializer = QuantitySerializer(Quantity.objects.filter(Quantity.objects.filter(Q(author__id=request.user.profile.profile.id) & Q(isresponse=True) & Q(order__isactive=True))), many=True)
+        serializer = QuantitySerializer(Quantity.objects.filter(Q(author__id=request.user.profile.provider.id) & Q(isresponse=True) & Q(order__isactive=True)),many=True)
         return Response(serializer.data)
-
-
-class PriceList(generics.ListAPIView):
-    queryset = Price.objects.all()
-    serializer_class = PriceSerializer
-
-
-class ReviewView(generics.ListCreateAPIView):
-    serializer_class = ReviewSerializer
-
-    def get_queryset(self, **kwargs):
-        return Review.objects.filter(to_id=kwargs['pk'])
-    
-
-
-
-    
-
-
-
-
-
-
-    
-

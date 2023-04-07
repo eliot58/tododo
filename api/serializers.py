@@ -53,7 +53,7 @@ class UserSignupSerializer(serializers.Serializer):
             raise serializers.ValidationError(error)
 
         return data
-
+    
 
 class ShapeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -71,33 +71,24 @@ class ImplementSerializer(serializers.ModelSerializer):
         model = Implement
         fields = '__all__'
 
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = ['fio', 'email', 'phone_number']
 
-
-class DilerSerializer(serializers.ModelSerializer):
-    fullName = serializers.CharField(max_length = 100)
+class DilerSerializer(serializers.Serializer):
+    fullName = serializers.CharField(max_length=100)
+    phone = serializers.CharField(max_length=12)
     email = serializers.EmailField()
-    phone = serializers.CharField(max_length=20)
-    region = serializers.SlugRelatedField(slug_field='data', read_only = True)
+    organization = serializers.CharField(max_length=200)
+    warehouse_address = serializers.CharField(max_length=200)
+    practice = serializers.IntegerField()
+    logo = serializers.FileField(required=False, allow_null=True)
+    region = serializers.IntegerField()
     regions = RegionSerializer(many = True, read_only = True)
 
-    def update(self, instance, validated_data):
-        instance.organization = validated_data.get('organization', instance.organization)
-        instance.warehouse_address = validated_data.get('warehouse_address', instance.warehouse_address)
-        instance.region = validated_data.get('region', instance.region)
-        instance.logo = validated_data.get('logo', instance.logo)
-        instance.save()
-        return instance
-    
 
-    class Meta:
-        model = Diler
-        fields = ['logo', 'organization', 'warehouse_address', 'region', 'regions', 'fullName', 'email', 'phone']
+class ProviderSerialiazer(serializers.ModelSerializer):
+    shapes_select = ShapeSerializer(many=True, read_only = True)
+    implements_select = ImplementSerializer(many=True, read_only = True)
+    regions_select = RegionSerializer(many=True, read_only = True)
 
-class ProviderSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.company = validated_data.get('company', instance.company)
         instance.legal_entity = validated_data.get('legal_entity', instance.legal_entity)
@@ -107,9 +98,15 @@ class ProviderSerializer(serializers.ModelSerializer):
         instance.service_entity = validated_data.get('service_entity', instance.service_entity)
         instance.service_phone = validated_data.get('service_phone', instance.service_phone)
         instance.service_email = validated_data.get('service_email', instance.service_email)
-        instance.shapes = validated_data.get('shapes', instance.shapes)
-        instance.regions = validated_data.get('regions', instance.regions)
-        instance.implements = validated_data.get('implements', instance.implements)
+        instance.shapes.clear()
+        for shape in validated_data['shapes']:
+            instance.shapes.add(shape)
+        instance.implements.clear()
+        for implement in validated_data['implements']:
+            instance.implements.add(implement)
+        instance.regions.clear()
+        for region in validated_data['regions']:
+            instance.regions.add(region)
         instance.logo = validated_data.get('logo', instance.logo)
         instance.description = validated_data.get('description', instance.description)
         instance.save()
@@ -117,13 +114,22 @@ class ProviderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Provider
-        fields = ['company', 'legal_entity', 'product_address', 'contact_entity', 'contact_phone', 'service_entity', 'service_phone', 'service_email', 'shapes', 'regions', 'implements', 'logo', 'description']
+        fields = ['company', 'legal_entity', 'product_address', 'contact_entity', 'contact_phone', 'service_entity', 'service_phone', 'service_email', 'shapes', 'regions', 'implements', 'logo', 'description', 'shapes_select', 'implements_select', 'regions_select']
+
 
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['user', 'shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'date', 'file' ]
+
+
+class OrderCreateSerializer(serializers.ModelSerializer):
+    files = serializers.ListField(child=serializers.FileField())
+
+    class Meta:
+        model = Order
+        fields = ['shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'files']
 
 
 class QuantitySerializer(serializers.ModelSerializer):
@@ -159,4 +165,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
-
