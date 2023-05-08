@@ -44,7 +44,7 @@ class Profile(models.Model):
     ]
     spec = models.CharField(max_length=9, choices=ch, verbose_name='Спец')
     email = models.EmailField(primary_key=True, verbose_name='Почта')
-    phone_number = models.CharField(max_length=12, unique=True, verbose_name='Телефон')
+    phone_number = models.CharField(max_length=20, unique=True, verbose_name='Телефон')
 
     class Meta:
         verbose_name = 'Аккаунт'
@@ -78,9 +78,9 @@ class Provider(models.Model):
     legal_entity = models.CharField(max_length=200, default='', verbose_name='Юридическое лицо')
     product_address = models.CharField(max_length=200, default='', verbose_name='Адрес производства')
     contact_entity = models.CharField(max_length=200, default='', verbose_name='Руководитель')
-    contact_phone = models.CharField(default='', max_length=12, verbose_name='Телефон производства')
+    contact_phone = models.CharField(default='', max_length=20, verbose_name='Телефон производства')
     service_entity = models.CharField(max_length=200, default='', verbose_name='Менеджер')
-    service_phone = models.CharField(default='',max_length=12, verbose_name='Контактный телефон')
+    service_phone = models.CharField(default='',max_length=20, verbose_name='Контактный телефон')
     service_email = models.EmailField(default='', verbose_name='E-mail')
     shapes = models.ManyToManyField(Shape, verbose_name='Профили', blank=True)
     regions = models.ManyToManyField(Region, verbose_name='Регионы', blank=True)
