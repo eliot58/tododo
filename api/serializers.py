@@ -63,7 +63,7 @@ class ShapeSerializer(serializers.ModelSerializer):
 class RegionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Region
-        fields = ['data']
+        fields = '__all__'
 
 class ImplementSerializer(serializers.ModelSerializer):
     
@@ -121,39 +121,47 @@ class ProviderSerialiazer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['user', 'shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'date', 'file' ]
+        fields = ['id', 'user', 'shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'date', 'file', 'quantity_set']
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
+    shapes_select = ShapeSerializer(many=True, read_only = True)
+    implements_select = ImplementSerializer(many=True, read_only = True)
+    regions_select = RegionSerializer(many=True, read_only = True)
     files = serializers.ListField(child=serializers.FileField())
 
     class Meta:
         model = Order
-        fields = ['shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'files']
-
+        fields = ['shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'files', 'shapes_select', 'implements_select', 'regions_select']
 
 class QuantitySerializer(serializers.ModelSerializer):
     order = OrderSerializer()
+    shape = serializers.SlugRelatedField(slug_field='data', read_only = True)
+    implement = serializers.SlugRelatedField(slug_field='data', read_only = True)
+
+    author = serializers.SlugRelatedField(slug_field="company", read_only = True)
+
     class Meta:
         model = Quantity
         fields = '__all__'
 
+class CreateQuantitySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Quantity
+        fields = ["order", "date", "shape", "implement", "price", "file", "comment"]
+
 
 class OrdersSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
     shape = serializers.SlugRelatedField(slug_field='data', read_only = True)
     implement = serializers.SlugRelatedField(slug_field='data', read_only = True)
     quantity_set = QuantitySerializer(many=True)
 
 
-    def update(self, instance, validated_data):
-        instance.isactive = validated_data.get('isactive', instance.isactive)
-        instance.save()
-        return instance
-
-
     class Meta:
         model = Order
-        fields = ['user', 'shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'date', 'file' ,'isactive', 'quantity_set']
+        fields = ['id', 'user', 'shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'date', 'file' ,'isactive', 'quantity_set']
 
 
 class PriceSerializer(serializers.ModelSerializer):
@@ -165,3 +173,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
+
+class ItemsSerializer(serializers.Serializer):
+    shapes_select = ShapeSerializer(many=True, read_only = True)
+    implements_select = ImplementSerializer(many=True, read_only = True)
+

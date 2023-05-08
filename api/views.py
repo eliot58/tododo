@@ -20,11 +20,7 @@ from core.tasks import *
 from .authentication import *
 
 from rest_framework import generics, views
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 from django.db.models import Q
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.decorators import parser_classes
 
 from django.core.files import File
 from pathlib import Path
@@ -43,7 +39,37 @@ class DilerClass:
         self.practice = practice
 
 
-@swagger_auto_schema(method='post',request_body=UserSigninSerializer)
+class ProviderClass:
+    def __init__(self, logo, company, legal_entity, product_address, contact_entity, contact_phone, service_entity, service_phone, service_email, shapes, regions, implements, description, shapes_select, implements_select, regions_select):
+        self.logo  = logo
+        self.company = company
+        self.legal_entity = legal_entity
+        self.product_address = product_address
+        self.contact_entity = contact_entity
+        self.contact_phone = contact_phone
+        self.service_entity = service_entity
+        self.service_phone = service_phone
+        self.service_email = service_email
+        self.shapes = shapes
+        self.regions = regions
+        self.implements = implements
+        self.description = description
+        self.shapes_select = shapes_select
+        self.implements_select = implements_select
+        self.regions_select = regions_select
+
+
+class ItemClass:
+    def __init__(self, shapes, implements):
+        self.shapes_select = shapes
+        self.implements_select = implements
+
+
+
+
+
+
+
 @api_view(["POST"])
 @permission_classes((AllowAny,))
 def signin(request):
@@ -67,7 +93,6 @@ def signin(request):
         'spec': user.profile.spec
     }, status=HTTP_200_OK)
 
-@swagger_auto_schema(method='post',request_body=UserSignupSerializer)
 @api_view(["POST"])
 @permission_classes((AllowAny,))
 def signup(request):
@@ -119,44 +144,57 @@ def isblank(request):
 @api_view(['GET'])
 def isdiler(request):
     return Response({"success": True if request.user.profile.spec == 'D' else False})
+
+@api_view(["GET"])
+def submit(request, id):
+    if request.user.profile.spec == 'P':
+        o = Quantity.objects.get(id=id)
+        if o.author_id == request.user.profile.provider.id:
+            o.order.isactive = False
+            o.order.save()
+        else:
+            return Response(data = {'success': True, "detail": None, "data": o}, status=HTTP_403_FORBIDDEN)
+    else:
+        o = Quantity.objects.get(id=id)
+        if request.user.profile.diler.id == o.order.user_id:
+            o.isresponse = True
+            o.save()
+    return Response(data = {'success': True, "detail": None, "data": o}, status=HTTP_200_OK)
     
 class DilerProfileView(views.APIView):
     def get(self, request):
-        diler = DilerClass(request.user.profile.diler.logo, request.user.profile.diler.organization, request.user.profile.diler.warehouse_address, request.user.profile.diler.region_id, Region.objects.all(), request.user.profile.fio, request.user.profile.email, request.user.profile.phone_number, request.user.profile.diler.practice)
+        diler = DilerClass(request.user.profile.diler.logo, request.user.profile.diler.organization, request.user.profile.diler.warehouse_address, request.user.profile.diler.region_id, Region.objects.all().order_by("id"), request.user.profile.fio, request.user.profile.email, request.user.profile.phone_number, request.user.profile.diler.practice)
         serializer = DilerSerializer(diler)
         return Response(serializer.data, status=HTTP_200_OK)
         
-
-    @swagger_auto_schema(request_body=DilerSerializer)
-    def put(self, request):
-        serializer = DilerSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
+    def patch(self, request):
+        serializer = DilerSerializer(data=request.data, partial=True)
+        if serializer.is_valid():
             user = request.user
-            user.profile.fio = serializer.data["fullName"]
-            user.profile.phone_number = serializer.data['phone']
-            user.profile.email = serializer.data['email']
+            user.profile.fio = serializer.validated_data["fullName"]
+            user.profile.phone_number = serializer.validated_data["phone"]
+            user.profile.email = serializer.validated_data["email"]
             user.profile.save()
-            user.profile.diler.organization = serializer.data['organization']
-            user.profile.diler.warehouse_address = serializer.data['warehouse_address']
+            user.profile.diler.organization = serializer.validated_data["organization"]
+            user.profile.diler.warehouse_address = serializer.validated_data["warehouse_address"]
             try:
-                user.profile.diler.logo = serializer.data['logo']
+                user.profile.diler.logo = serializer.validated_data['logo']
             except KeyError:
                 pass
-            user.profile.diler.region_id = serializer.data['region']
+            user.profile.diler.region_id = serializer.validated_data.get("region", user.profile.diler.region_id)
             user.profile.diler.save()
-            return Response(serializer.data, status=HTTP_200_OK)
+            return Response({"status": "success", "detail": None, "data": None}, status=HTTP_200_OK)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class ProviderProfileView(views.APIView):
     def get(self, request):
-        serializer = ProviderSerialiazer(request.user.profile.provider)
+        provider = ProviderClass(company=request.user.profile.provider.company, legal_entity=request.user.profile.provider.legal_entity, product_address=request.user.profile.provider.product_address, contact_entity=request.user.profile.provider.contact_entity, contact_phone=request.user.profile.provider.contact_phone, service_entity=request.user.profile.provider.service_entity, service_email=request.user.profile.provider.service_email, service_phone=request.user.profile.provider.service_phone, shapes=request.user.profile.provider.shapes, regions=request.user.profile.provider.regions, implements=request.user.profile.provider.implements, shapes_select=Shape.objects.all().order_by("id"), implements_select=Implement.objects.all().order_by("id"), regions_select=Region.objects.all().order_by("id"), description=request.user.profile.provider.description, logo=request.user.profile.provider.logo)
+        serializer = ProviderSerialiazer(provider)
         return Response(serializer.data, status=HTTP_200_OK)
     
-
-    @swagger_auto_schema(request_body=ProviderSerialiazer)
-    def put(self, request):
-        serializer = ProviderSerialiazer(instance=request.user.profile.provider, data=request.data)
+    def patch(self, request):
+        serializer = ProviderSerialiazer(instance=request.user.profile.provider, data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=HTTP_200_OK)
@@ -164,26 +202,23 @@ class ProviderProfileView(views.APIView):
 
 
 class OrderView(views.APIView):
-    @swagger_auto_schema(manual_parameters=[openapi.Parameter('id', openapi.IN_PATH, description="post id", type=openapi.TYPE_INTEGER)])
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         try:
-            serializer = OrdersSerializer(Order.objects.get(id=kwargs['pk']))
+            serializer = OrdersSerializer(Order.objects.get(id=request.query_params.get('id')))
         except Order.DoesNotExist:
             return Response({'error': 'Order does not exist'}, status=HTTP_404_NOT_FOUND)
         return Response(serializer.data)
 
-    @swagger_auto_schema(request_body=OrderCreateSerializer)
     def post(self, request):
         if request.user.profile.spec == 'D':
             serializer = OrderCreateSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 user = request.user
-                order = user.profile.diler.order_set.create(shape_id=request.data['shape'],implement_id=request.data['implement'],address=request.data['address'], type_pay=request.data['type_pay'], type_delivery=request.data['type_delivery'], amount_window=int(request.data['amount_window']), price=request.data['price'], comment=request.data['comment'])
-                files = request.FILES.getlist('file')
+                order = user.profile.diler.order_set.create(shape=serializer.validated_data['shape'],implement=serializer.validated_data['implement'],address=serializer.validated_data['address'], type_pay=serializer.validated_data['type_pay'], type_delivery=serializer.validated_data['type_delivery'], amount_window=int(serializer.validated_data['amount_window']), price=serializer.validated_data['price'], comment=serializer.validated_data['comment'])
+                files = serializer.validated_data["files"]
                 f = []
                 os.system('rm -rf scetch.zip')
                 for file in files:
-                    print(file)
                     f.append(file.temporary_file_path())
                 os.system('rm -rf scetch.zip')
                 patoolib.create_archive('scetch.zip',f)
@@ -195,23 +230,15 @@ class OrderView(views.APIView):
                 return Response(status=HTTP_201_CREATED)
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
         return Response(status=HTTP_403_FORBIDDEN)
+    
+    def delete(self, request):
+        order = Order.objects.get(id=request.query_params.get('id'))
+        if order.user != request.user.profile.diler:
+            return Response(status=HTTP_403_FORBIDDEN)
+        order.delete()
+        return Response(data={"status": "success"}, status=HTTP_200_OK)
 
 
-    @swagger_auto_schema(request_body=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'isactive': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='isactive')
-                        }))
-    def patch(self, request, *args, **kwargs):
-        try:
-            instance = Order.objects.get(id=kwargs['pk'])
-        except Order.DoesNotExist:
-            return Response({'error': 'Order does not exist'})
-        serializer = OrdersSerializer(instance=instance, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=HTTP_200_OK)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 class OrdersView(views.APIView):
     def get(self, request):
@@ -228,13 +255,25 @@ class QuantityView(views.APIView):
         if request.user.profile.spec == 'P':
             serializer = QuantitySerializer(request.user.profile.provider.quantity_set.filter(order__isactive=True), many=True)
             return Response(serializer.data)
+        
 
-    def patch(self, request, **kwargs):
-        serializer = QuantitySerializer(instance = Quantity.objects.get(id=kwargs['pk']), data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        if request.user.profile.spec == "P":
+            serializer = CreateQuantitySerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                q = Quantity()
+                q.order = serializer.validated_data['order']
+                q.author  = request.user.profile.provider
+                q.date = serializer.validated_data['date']
+                q.shape = serializer.validated_data['shape']
+                q.implement = serializer.validated_data['implement']
+                q.price = serializer.validated_data['price']
+                q.file = serializer.validated_data['file']
+                q.comment = serializer.validated_data['comment']
+                q.save()
+                return Response(status=HTTP_201_CREATED)
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        return Response(status=HTTP_403_FORBIDDEN)
     
 
 
@@ -256,3 +295,28 @@ class WorkList(views.APIView):
             return Response(serializer.data)
         serializer = QuantitySerializer(Quantity.objects.filter(Q(author__id=request.user.profile.provider.id) & Q(isresponse=True) & Q(order__isactive=True)),many=True)
         return Response(serializer.data)
+    
+
+
+class ItemsList(views.APIView):
+
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return Response(status=HTTP_403_FORBIDDEN)
+        serializer = ItemsSerializer(ItemClass(shapes=Shape.objects.all().order_by("id"), implements=Implement.objects.all().order_by("id")))
+        return Response(serializer.data)
+    
+
+class PriceList(generics.ListAPIView):
+    queryset = Price.objects.all().order_by("price")
+    serializer_class = PriceSerializer
+    
+
+
+class CompanyView(views.APIView):
+    def get(self, request, *args, **kwargs):
+        if request.user.profile.spec == 'D':
+            return Response(status=HTTP_403_FORBIDDEN)
+        company_serializer = ProviderSerialiazer(Provider.objects.get(id=kwargs["id"]))
+        reviews_serializer = ReviewSerializer(Review.objects.filter(to_id=kwargs["id"]))
+        return Response(data={'company': company_serializer.data, 'reviews': reviews_serializer.data})

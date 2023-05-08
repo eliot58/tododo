@@ -13,4 +13,9 @@ urlpatterns = [
     path('archive/', ArchiveList.as_view()),
     path('work/', WorkList.as_view()),
     path('isdiler/', isdiler),
+    path('isblank/', isblank),
+    path('getitems/', ItemsList.as_view()),
+    path('prices/', PriceList.as_view()),
+    path('company/<int:id>/', CompanyView.as_view()),
+    path('submit/<int:id>/', submit),
 ]

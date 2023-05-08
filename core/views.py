@@ -125,10 +125,7 @@ def diler_order(request, id):
 
 @login_required(login_url='/login/')
 def diler_profile_save(request):
-    if request.method == 'GET':
-        regions = Region.objects.all()
-        return render(request, 'diler/diler-profile.html', {'regions': regions})
-    else:
+    if request.method == 'POST':
         user = request.user
         user.profile.fio = request.POST['fio']
         user.profile.phone_number = request.POST['phone']
@@ -143,6 +140,8 @@ def diler_profile_save(request):
         user.profile.diler.region_id = request.POST['region']
         user.profile.diler.save()
         return redirect(diler_orders)
+    regions = Region.objects.all()
+    return render(request, 'diler/diler-profile.html', {'regions': regions})
 
 
 
@@ -160,7 +159,6 @@ def order_save(request):
         f = []
         os.system('rm -rf scetch.zip')
         for file in files:
-            print(file)
             f.append(file.temporary_file_path())
         os.system('rm -rf scetch.zip')
         patoolib.create_archive('scetch.zip',f)
@@ -182,12 +180,7 @@ def order_save(request):
 @login_required(login_url='/login/')
 def provider_profile(request):
     if request.user.profile.spec == 'P':
-        if request.method == 'GET':
-            shapes = Shape.objects.all()
-            implements = Implement.objects.all()
-            regions = Region.objects.all()
-            return render(request, 'provider/profile-company.html', {'shapes': shapes, 'implements': implements, 'regions': regions})
-        else:
+        if request.method == 'POST':
             p = request.user.profile.provider
             flag = False
             if len(p.regions.all()) == 0:
@@ -231,6 +224,11 @@ def provider_profile(request):
                 sendmass(p.id, False)
 
             return redirect(index)
+        
+        shapes = Shape.objects.all()
+        implements = Implement.objects.all()
+        regions = Region.objects.all()
+        return render(request, 'provider/profile-company.html', {'shapes': shapes, 'implements': implements, 'regions': regions})
     
 
     else:

@@ -31,11 +31,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'drf_yasg',
     'core',
     'rest_framework',
     'rest_framework.authtoken',
-    'api'
+    'api',
+    'api1'
+
 ]
 
 MIDDLEWARE = [
@@ -141,18 +142,6 @@ else:
     MEDIA_URL = '/media/'
     STATIC_ROOT = '/var/www/tododo/static'
     STATIC_URL = '/static/'
-
-
-SWAGGER_SETTINGS = {
-   'SECURITY_DEFINITIONS': {
-        'DRF Token': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
-    }
-}
-
 
 
 # Default primary key field type
