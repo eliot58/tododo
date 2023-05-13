@@ -156,7 +156,7 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-TOKEN_EXPIRED_AFTER_SECONDS = 60 * 60 * 48
+TOKEN_EXPIRED_AFTER_SECONDS = 60
 
 
 PASSWORD_HASHERS = [
@@ -200,9 +200,6 @@ if not DEBUG:
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'api.authentication.ExpiringTokenAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
     )
 }
 

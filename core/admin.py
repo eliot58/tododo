@@ -67,3 +67,8 @@ class ImplementAdmin(admin.ModelAdmin):
 
 admin.site.register(Quantity)
 
+
+@admin.register(Contacts)
+class ContactsAdmin(admin.ModelAdmin):
+    list_display = ['user', 'file']
+
