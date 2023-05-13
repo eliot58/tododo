@@ -65,6 +65,10 @@ class ItemClass:
         self.implements_select = implements
 
 
+@api_view(["POST"])
+def phonesSend(request):
+    savephones(request.user.profile.provider, request.data)
+    return Response(status=HTTP_200_OK)
 
 
 

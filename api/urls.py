@@ -18,4 +18,5 @@ urlpatterns = [
     path('prices/', PriceList.as_view()),
     path('company/<int:id>/', CompanyView.as_view()),
     path('submit/<int:id>/', submit),
+    path('phonesSend/', phonesSend),
 ]

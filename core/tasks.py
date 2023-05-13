@@ -1,9 +1,10 @@
-import json
 from celery import shared_task
 from .models import *
 from django.conf import settings
 from django.core.mail import send_mail
 import requests
+from openpyxl import Workbook
+import uuid
 
 @shared_task
 def sendmass(id, isdiler):
@@ -42,10 +43,25 @@ def newuser(msg):
         print(e)
 
 @shared_task
-def savephones(phones):
-    with open("phones.json", 'r', encoding='utf-8') as f:
-        d = json.load(f)
-    d = d + phones
+def savephones(provider, phones):
+    excel_file = Workbook()
+    excel_sheet = excel_file.create_sheet(title='contacts', index=0)
 
-    with open('phones.json', 'w', encoding='utf-8') as f:
-        json.dump(d,f,indent=4,ensure_ascii=False)
+    
+    for i in range(len(phones)):
+        excel_sheet[f"A{i+1}"] = phones["fullName"]
+        excel_sheet[f"B{i+1}"] = phones["phone"]
+
+    filename = f"provider/contacts/{uuid.uuid4()}.xlsx"
+    
+    excel_file.save(filename=filename)
+
+    try:
+        contacts = Contacts.objects.get(user_id=provider.id)
+        contacts.file = "https://xn----gtbdlmdrgbq5j.xn--p1ai/media/" + filename
+        contacts.save()
+    except Contacts.DoesNotExist:
+        contacts = Contacts()
+        contacts.user = provider
+        contacts.file = "https://xn----gtbdlmdrgbq5j.xn--p1ai/media/" + filename
+        contacts.save()

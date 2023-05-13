@@ -155,6 +155,10 @@ class Quantity(models.Model):
 
     def filename(self):
         return os.path.basename(self.file.name)
+    
+    class Meta:
+        verbose_name = 'Комм. предложение'
+        verbose_name_plural = 'Комм. предложения'
 
 
 class Price(models.Model):
@@ -166,3 +170,12 @@ class Price(models.Model):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+
+
+class Contacts(models.Model):
+    user = models.ForeignKey(Provider, on_delete=models.CASCADE)
+    file = models.URLField()
+
+    class Meta:
+        verbose_name = 'Контакт'
+        verbose_name_plural = 'Контакты'
