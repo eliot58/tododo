@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 import requests
 from openpyxl import Workbook
 import uuid
+from django.conf import settings
 
 @shared_task(bind=True)
 def sendmass(self, id, isdiler):
@@ -52,16 +53,21 @@ def savephones(self, provider_id, phones):
         excel_sheet[f"A{i+1}"] = phones[i]["fullName"]
         excel_sheet[f"B{i+1}"] = phones[i]["phone"]
 
-    filename = f"media/provider/{uuid.uuid4()}.xlsx"
+    if settings.DEBUG:
+        filename = f"media/provider/{uuid.uuid4()}.xlsx"
+        base_url = "http://127.0.0.1:8000/"
+    else:
+        filename = f"{settings.MEDIA_ROOT}/provider/{uuid.uuid4()}.xlsx"
+        base_url = "https://xn----gtbdlmdrgbq5j.xn--p1ai/"
     
     excel_file.save(filename=filename)
 
     try:
         contacts = Contacts.objects.get(user_id=provider_id)
-        contacts.file = "https://xn----gtbdlmdrgbq5j.xn--p1ai/" + filename
+        contacts.file = base_url + filename
         contacts.save()
     except Contacts.DoesNotExist:
         contacts = Contacts()
         contacts.user_id = provider_id
-        contacts.file = "https://xn----gtbdlmdrgbq5j.xn--p1ai/" + filename
+        contacts.file = base_url + filename
         contacts.save()
