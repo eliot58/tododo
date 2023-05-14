@@ -6,8 +6,8 @@ import requests
 from openpyxl import Workbook
 import uuid
 
-@shared_task
-def sendmass(id, isdiler):
+@shared_task(bind=True)
+def sendmass(self, id, isdiler):
     if isdiler:
         order = Order.objects.get(id=id)
         m = f'Появился новый расчёт по адресу: {order.address}' + '\n' + f'Профиль: {order.shape.data}' + '\n' + f'Фурнитура: {order.implement.data}' + '\n' + f'М2: {order.amount_window}' + '\n' + 'Подробности в сервисе: дилеры-окон.рф'
@@ -35,33 +35,33 @@ def sendmass(id, isdiler):
                 msg = diler.organization + '\n' + f'Зарегестрировался новый поставщик окон https://xn----gtbdlmdrgbq5j.xn--p1ai/diler/company/card/{p.id}, попробуйте разместить заказ и узнайте цену поставщика https://xn----gtbdlmdrgbq5j.xn--p1ai/diler/company/card/{p.id}' + '\n' + 'Вы получили это сообщение, потому что были зарегистрированы на сайте дилеры-окон.рф' + '\n' + 'Если Вы не хотите получать это сообщение, то его можно отключить в разделе профиля'
                 send_mail('Новый поставщик', msg, settings.EMAIL_HOST_USER, [diler.user.email], fail_silently=False)
 
-@shared_task
-def newuser(msg):
+@shared_task(bind=True)
+def newuser(self, msg):
     try:
         requests.post('https://api.telegram.org/bot5852658863:AAHezP9l75ukvpQHSD3Bt5x24kMETAeqDfY/sendMessage', json={'chat_id': '-1001881532635', 'text': msg})
     except Exception as e:
         print(e)
 
-@shared_task
-def savephones(provider, phones):
+@shared_task(bind=True)
+def savephones(self, provider_id, phones):
     excel_file = Workbook()
     excel_sheet = excel_file.create_sheet(title='contacts', index=0)
 
     
     for i in range(len(phones)):
-        excel_sheet[f"A{i+1}"] = phones["fullName"]
-        excel_sheet[f"B{i+1}"] = phones["phone"]
+        excel_sheet[f"A{i+1}"] = phones[i]["fullName"]
+        excel_sheet[f"B{i+1}"] = phones[i]["phone"]
 
-    filename = f"provider/contacts/{uuid.uuid4()}.xlsx"
+    filename = f"media/provider/{uuid.uuid4()}.xlsx"
     
     excel_file.save(filename=filename)
 
     try:
-        contacts = Contacts.objects.get(user_id=provider.id)
-        contacts.file = "https://xn----gtbdlmdrgbq5j.xn--p1ai/media/" + filename
+        contacts = Contacts.objects.get(user_id=provider_id)
+        contacts.file = "https://xn----gtbdlmdrgbq5j.xn--p1ai/" + filename
         contacts.save()
     except Contacts.DoesNotExist:
         contacts = Contacts()
-        contacts.user = provider
-        contacts.file = "https://xn----gtbdlmdrgbq5j.xn--p1ai/media/" + filename
+        contacts.user_id = provider_id
+        contacts.file = "https://xn----gtbdlmdrgbq5j.xn--p1ai/" + filename
         contacts.save()

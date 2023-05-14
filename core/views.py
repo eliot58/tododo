@@ -68,7 +68,7 @@ def signup(request):
             msg = 'Вы зарегистрировались как ' + spec + '\n' + 'Ваш login: ' + request.POST['email'] + '\n' + 'Ваш password: ' + password
             try:
                 send_mail('Регистрация в todotodo', msg, settings.EMAIL_HOST_USER, [request.POST['email']], fail_silently=False)
-                newuser(f'В сервис зарегистрировался новый {spec.lower()}: {cd["fio"]}, подробнее в дилеры-окон.рф')
+                newuser.delay(f'В сервис зарегистрировался новый {spec.lower()}: {cd["fio"]}, подробнее в дилеры-окон.рф')
             except:
                 new_user.delete()
                 return render(request, 'auth/lose_register.html')
@@ -221,7 +221,7 @@ def provider_profile(request):
                 p.regions.clear()
 
             if flag:
-                sendmass(p.id, False)
+                sendmass.delay(p.id, False)
 
             return redirect(index)
         

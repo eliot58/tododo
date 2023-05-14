@@ -67,7 +67,7 @@ class ItemClass:
 
 @api_view(["POST"])
 def phonesSend(request):
-    savephones(request.user.profile.provider, request.data)
+    savephones.delay(request.user.profile.provider.id, request.data)
     return Response(status=HTTP_200_OK)
 
 
