@@ -247,9 +247,9 @@ class OrderView(views.APIView):
 class OrdersView(views.APIView):
     def get(self, request):
         if request.user.profile.spec == 'D':
-            serializer = OrdersSerializer(Order.objects.filter(isactive=True), many = True)
+            serializer = OrdersSerializer(Order.objects.filter(Q(user__id=request.user.profile.diler.id) & Q(isactive=True)).order_by("-id"), many = True)
             return Response(serializer.data)
-        serializer = OrdersSerializer(Order.objects.filter(user__region__in=request.user.profile.provider.regions.all()), many=True)
+        serializer = OrdersSerializer(Order.objects.filter(user__region__in=request.user.profile.provider.regions.all()).order_by("-id"), many=True)
         return Response(serializer.data)
     
 
