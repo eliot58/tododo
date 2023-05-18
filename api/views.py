@@ -125,7 +125,7 @@ def signup(request):
     msg = 'Вы зарегистрировались как ' + spec + '\n' + 'Ваш login: ' + serializer.data['email'] + '\n' + 'Ваш password: ' + password
     try:
         send_mail('Регистрация в todotodo', msg, settings.EMAIL_HOST_USER, [serializer.data['email']], fail_silently=False)
-        # newuser(f'В сервис зарегистрировался новый {spec.lower()}: {serializer.data["fullName"]}, подробнее в дилеры-окон.рф')
+        newuser.delay(f'В сервис зарегистрировался новый {spec.lower()}: {serializer.data["fullName"]}, подробнее в дилеры-окон.рф')
     except:
         new_user.delete()
         return Response({'detail': 'Invalid Credentials'}, status=HTTP_400_BAD_REQUEST)
@@ -231,6 +231,7 @@ class OrderView(views.APIView):
                     order.file = File(f,name=path.name)
                     order.save()
                 os.system('rm -rf scetch.zip')
+                sendmass.delay(order.id, True)
                 return Response(status=HTTP_201_CREATED)
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
         return Response(status=HTTP_403_FORBIDDEN)

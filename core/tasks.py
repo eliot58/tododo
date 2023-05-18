@@ -67,9 +67,7 @@ def savephones(self, provider_id, phones):
     excel_file.save(filename=filename)
 
     try:
-        contacts = Contacts.objects.get(user_id=provider_id)
-        contacts.file = base_url + file_url
-        contacts.save()
+        Contacts.objects.get(user_id=provider_id)
     except Contacts.DoesNotExist:
         contacts = Contacts()
         contacts.user_id = provider_id

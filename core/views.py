@@ -182,9 +182,6 @@ def provider_profile(request):
     if request.user.profile.spec == 'P':
         if request.method == 'POST':
             p = request.user.profile.provider
-            flag = False
-            if len(p.regions.all()) == 0:
-                flag = True
             p.user = request.user.profile
             p.company = request.POST['company']
             p.legal_entity = request.POST['legal_entity']
@@ -219,9 +216,6 @@ def provider_profile(request):
                     p.regions.add(Region.objects.get(id=i))
             except KeyError:
                 p.regions.clear()
-
-            if flag:
-                sendmass.delay(p.id, False)
 
             return redirect(index)
         
