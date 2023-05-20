@@ -130,6 +130,10 @@ class Order(models.Model):
     isactive = models.BooleanField(default=True)
 
 
+    def __str__(self) -> str:
+        return str(self.id)
+
+
     def filename(self):
         return os.path.basename(self.file.name)
 
@@ -141,16 +145,19 @@ class Order(models.Model):
 
 
 class Quantity(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    author = models.ForeignKey(Provider, on_delete=models.CASCADE)
-    date_create = models.DateField(auto_now_add=True)
-    date = models.DateField()
-    shape = models.ForeignKey(Shape, on_delete=models.CASCADE)
-    implement = models.ForeignKey(Implement, on_delete=models.CASCADE)
-    price = models.FloatField()
-    file = models.FileField(upload_to='providers/quantity/files')
-    comment = models.TextField(null=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name="Заказ")
+    author = models.ForeignKey(Provider, on_delete=models.CASCADE, verbose_name="Автор КП")
+    date_create = models.DateField(auto_now_add=True, verbose_name="Дата создания")
+    date = models.DateField(verbose_name="Дата поставки")
+    shape = models.ForeignKey(Shape, on_delete=models.CASCADE, verbose_name="Профиль")
+    implement = models.ForeignKey(Implement, on_delete=models.CASCADE, verbose_name="Фурнитура")
+    price = models.FloatField(verbose_name="Предложенная цена")
+    file = models.FileField(upload_to='providers/quantity/files', verbose_name="Файл")
+    comment = models.TextField(null=True, verbose_name="Кооментарий")
     isresponse = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return str(self.id)
 
 
     def filename(self):
@@ -179,3 +186,17 @@ class Contacts(models.Model):
     class Meta:
         verbose_name = 'Контакт'
         verbose_name_plural = 'Контакты'
+
+
+class Manager(models.Model):
+    date = models.DateField(auto_now_add=True)
+    manager = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    client = models.ForeignKey(Profile, on_delete=models.DO_NOTHING)
+    comment = models.TextField()
+    file = models.FileField(upload_to="manager/files")
+
+
+    class Meta:
+        verbose_name = 'Менеджер'
+        verbose_name_plural = 'Менеджеры'
+
