@@ -35,6 +35,7 @@ class Implement(models.Model):
         return self.data
 
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Аккаунт')
     fio = models.CharField(max_length=100, verbose_name='ФИО')
@@ -97,6 +98,13 @@ class Provider(models.Model):
         verbose_name = 'Поставщик'
         verbose_name_plural = 'Поставщики'
 
+class DilerComment(models.Model):
+    text = models.TextField(verbose_name="Комментарий менеджера")
+    diler = models.ForeignKey(Diler, on_delete=models.DO_NOTHING, null=True, blank=True)
+
+class ProviderComment(models.Model):
+    text = models.TextField(verbose_name="Комментарий менеджера")
+    diler = models.ForeignKey(Provider, on_delete=models.DO_NOTHING, null=True, blank=True)
 
 class Review(models.Model):
     to = models.ForeignKey(Provider, on_delete=models.CASCADE)
@@ -199,4 +207,3 @@ class Manager(models.Model):
     class Meta:
         verbose_name = 'Менеджер'
         verbose_name_plural = 'Менеджеры'
-
