@@ -110,7 +110,7 @@ class DilerComment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self) -> str:
-        return f"Комментарий {self.id}"
+        return f"{self.text}"
 
 class ProviderComment(models.Model):
     text = models.TextField(verbose_name="Комментарий менеджера")
@@ -122,7 +122,7 @@ class ProviderComment(models.Model):
 
 
     def __str__(self) -> str:
-        return f"Комментарий {self.id}"
+        return f"{self.text}"
 
 class Review(models.Model):
     to = models.ForeignKey(Provider, on_delete=models.CASCADE)

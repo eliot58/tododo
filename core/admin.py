@@ -114,12 +114,13 @@ class ContactsAdmin(admin.ModelAdmin):
 
 @admin.register(LogEntry)
 class LogAdmin(admin.ModelAdmin):
-    list_display = ['action_time', 'user', 'content_type', 'object_repr', 'change_message_text']
+    list_display = ['action_time', 'user', 'content_type', 'object_repr', 'change_message']
 
-    @admin.display(ordering='change_message', description='Сообщение')
-    def change_message_text(self, obj):
-        try:
-            data = json.loads(obj.change_message)[0]
-        except:
-            return ""
-        return "Добавлен " + str(data["added"]) if "added" in data else "Изменен " + str(data["changed"]["fields"])
+    # @admin.display(ordering='change_message', description='Сообщение')
+    # def change_message_text(self, obj):
+    #     try:
+    #         data = json.loads(obj.change_message)[0]
+    #     except:
+    #         return ""
+    #     return "Добавлен " + str(data["added"]) if "added" in data else "Изменен " + str(data["changed"]["fields"])
+    
