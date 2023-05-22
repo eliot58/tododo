@@ -111,9 +111,29 @@ class ContactsAdmin(admin.ModelAdmin):
     list_display = ['user', 'file']
 
 
+class ManagerFilter(admin.SimpleListFilter):
+    title = ('manager')
+
+    parameter_name = 'manager'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('manager', ('manager')),
+            ('all', ('all')),
+        )
+
+    def queryset(self, request, queryset):
+
+        if self.value() == 'all':
+            return queryset.all()
+        if self.value() == 'manager':
+            return queryset.filter(
+                user__username = 'manager3453'
+            )
 
 @admin.register(LogEntry)
 class LogAdmin(admin.ModelAdmin):
+    list_filter = (ManagerFilter, )
     list_display = ['action_time', 'user', 'content_type', 'object_repr', 'change_message_text']
 
     @admin.display(ordering='change_message', description='Сообщение')
