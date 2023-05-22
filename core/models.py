@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import os
+from simple_history.models import HistoricalRecords
 
 
 class Region(models.Model):
@@ -63,6 +64,7 @@ class Diler(models.Model):
     region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Регион')
     practice = models.PositiveIntegerField(default=0, verbose_name='Опыт')
     isEmailsubmit = models.BooleanField(default=True)
+    history = HistoricalRecords()
 
 
     def __str__(self):
@@ -89,6 +91,7 @@ class Provider(models.Model):
     logo = models.FileField(upload_to='provider/logo', null=True, blank=True, verbose_name='Логотип')
     description = models.TextField(default='', blank=True, verbose_name='О компании')
     isEmailsubmit = models.BooleanField(default=True)
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.user.fio
@@ -102,9 +105,24 @@ class DilerComment(models.Model):
     text = models.TextField(verbose_name="Комментарий менеджера")
     diler = models.ForeignKey(Diler, on_delete=models.DO_NOTHING, null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self) -> str:
+        return f"Комментарий {self.id}"
+
 class ProviderComment(models.Model):
     text = models.TextField(verbose_name="Комментарий менеджера")
     diler = models.ForeignKey(Provider, on_delete=models.DO_NOTHING, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+
+    def __str__(self) -> str:
+        return f"Комментарий {self.id}"
 
 class Review(models.Model):
     to = models.ForeignKey(Provider, on_delete=models.CASCADE)
@@ -136,6 +154,7 @@ class Order(models.Model):
     date = models.DateField(auto_now_add=True, verbose_name='Дата создания')
     file = models.FileField(upload_to='diler/order/files')
     isactive = models.BooleanField(default=True)
+    history = HistoricalRecords()
 
 
     def __str__(self) -> str:
@@ -163,6 +182,7 @@ class Quantity(models.Model):
     file = models.FileField(upload_to='providers/quantity/files', verbose_name="Файл")
     comment = models.TextField(null=True, verbose_name="Кооментарий")
     isresponse = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     def __str__(self) -> str:
         return str(self.id)
@@ -180,6 +200,7 @@ class Price(models.Model):
     title = models.CharField(max_length=20)
     price = models.PositiveBigIntegerField()
     description = models.CharField(max_length=50)
+    history = HistoricalRecords()
 
 
     class Meta:
@@ -194,16 +215,3 @@ class Contacts(models.Model):
     class Meta:
         verbose_name = 'Контакт'
         verbose_name_plural = 'Контакты'
-
-
-class Manager(models.Model):
-    date = models.DateField(auto_now_add=True)
-    manager = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    client = models.ForeignKey(Profile, on_delete=models.DO_NOTHING)
-    comment = models.TextField()
-    file = models.FileField(upload_to="manager/files")
-
-
-    class Meta:
-        verbose_name = 'Менеджер'
-        verbose_name_plural = 'Менеджеры'
