@@ -119,13 +119,10 @@ class ManagerFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return (
             ('manager', ('manager')),
-            ('all', ('all')),
         )
 
     def queryset(self, request, queryset):
 
-        if self.value() == 'all':
-            return queryset.all()
         if self.value() == 'manager':
             return queryset.filter(
                 user__username = 'manager3453'
