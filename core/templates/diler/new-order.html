@@ -97,7 +97,14 @@
                             </div>
                             <textarea class="account__input" name="comment" required cols="10" rows="3" placeholder="Комментарий к заказу"></textarea>
                         </div>
-                        <div class="wrapper order__upload">
+                        <div class="call__upload d-flex align-items-center" style="margin-left: 12px;">
+                            <input onchange="select_file(this.files)" id="input_file" required type="file" name="upload" style="position: absolute; bottom: 0; left: 0; z-index: -10;">
+                            <button onclick="upload_file()" type="button" class="balance__outline outline__btn">Загрузите эскиз</button>
+                            <div class="call__upload-delete mx-3">
+                                <a id="filename" href="#"></a>
+                            </div>
+                        </div>
+                        <!-- <div class="wrapper order__upload">
                             <div class="tab_content order__uploads">
                                 <div class="tab_item order__upload-wrapper m-5">
                                     <input required type="file" class="my" id="myfile" name="upl" multiple />
@@ -109,7 +116,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <button type="submit" class="form__btn main__btn mt-3 mb-3 mx-auto pl-3 d-flex">Создать</button>
                     </div>
                 </form>
@@ -198,79 +205,13 @@
 
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
     <script>
-        function upload_btn(){
-            document.getElementById('myfile').click()
+        function upload_file(){
+            document.getElementById('input_file').click()
         }
-        var dt = new DataTransfer();
 
-        $('.order__upload-wrapper input[type=file]').on('change', function () {
-            let $files_list = $(this).closest('.order__upload-wrapper').next().find('.order__upload-height');
-            
-
-            for (var i = 0; i < this.files.length; i++) {
-                let file = this.files.item(i);
-                dt.items.add(file);
-
-                let reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onloadend = function () {
-                const file_ex = file.name.split('.').slice(-1)
-                let new_file_input = ''
-                if (file_ex[0] == 'pdf') {
-                    new_file_input = '<div class="order__upload-item">' +
-                                            '<div class="order__upload-name">' +
-                                                '<div class="order__upload-img">' +
-                                                    '<img src="{% static "assets/img/ico/pfd.svg" %}" alt="img" />' +
-                                                '</div>' +
-                                                '<div class="order__upload-intro">' +
-                                                    '<a id="filename" href="#">' + file.name + '</a>' +
-                                                '</div>' +
-                                            '</div>' +
-                                            '<div class="order__upload-size">' +
-                                                '<div class="order__upload-size-item">' +
-                                                    '<p id="filesize">'+ file.size + 'KB</p>' +
-                                                    '<button type="button" onclick="removeFilesItem(this)" class="delete__btn"><img src="{% static "assets/img/ico/delete.svg" %}" alt="menu" /></button>' +
-                                                '</div>' +
-                                            '</div>' +
-                                        '</div>';
-                } else {
-                    new_file_input = '<div class="order__upload-item">' +
-                                            '<div class="order__upload-name">' +
-                                                '<div class="order__upload-img">' +
-                                                    '<img src="{% static "assets/img/ico/img.svg" %}" alt="img" />' +
-                                                '</div>' +
-                                                '<div class="order__upload-intro">' +
-                                                    '<a id="filename" href="#">' + file.name + '</a>' +
-                                                '</div>' +
-                                            '</div>' +
-                                            '<div class="order__upload-size">' +
-                                                '<div class="order__upload-size-item">' +
-                                                    '<p id="filesize">'+ file.size / 1000 + 'KB</p>' +
-                                                    '<button type="button" onclick="removeFilesItem(this)" class="delete__btn"><img src="{% static "assets/img/ico/delete.svg" %}" alt="menu" /></button>' +
-                                                '</div>' +
-                                            '</div>' +
-                                        '</div>'
-                }
-                $files_list.append(new_file_input);
-                }
-            };
-            this.files = dt.files;
-        })
-
-        function removeFilesItem(target) {
-            let name = $(target).closest('.order__upload-item').find('a[id=filename]').text();
-            let input = $(target).closest('.order__uploads').find('input[type=file]');
-            $(target).closest('.order__upload-item').remove();
-            for (let i = 0; i < dt.items.length; i++) {
-                if (name === dt.items[i].getAsFile().name) {
-                dt.items.remove(i);
-                }
-            }
-            console.log(input[0].files)
-            console.log(dt.files)
-            input[0].files = dt.files;
-        }
-                
+        function select_file(files){
+            document.getElementById('filename').innerHTML = files[0].name
+        }    
     </script>
     <script>
         window.replainSettings = { id: 'e0e3e15f-5e92-4a18-b1fc-cd3da63621ce' };

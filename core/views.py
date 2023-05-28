@@ -9,10 +9,6 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.http import HttpResponseForbidden, JsonResponse
-from django.core.files import File
-from pathlib import Path
-import patoolib
-import os
 from django.views.decorators.csrf import csrf_exempt
 import logging
 from .tasks import *
@@ -155,18 +151,8 @@ def order_save(request):
     else:
         user = request.user
         order = user.profile.diler.order_set.create(shape_id=request.POST['shape'],implement_id=request.POST['implement'],address=request.POST['address'], type_pay=request.POST['type_pay'], type_delivery=request.POST['type_delivery'], amount_window=int(request.POST['amount']), price=request.POST['price'], comment=request.POST['comment'])
-        files = request.FILES.getlist('upl')
-        f = []
-        os.system('rm -rf scetch.zip')
-        for file in files:
-            f.append(file.temporary_file_path())
-        os.system('rm -rf scetch.zip')
-        patoolib.create_archive('scetch.zip',f)
-        path = Path('scetch.zip')
-        with path.open(mode='rb') as f:
-            order.file = File(f,name=path.name)
-            order.save()
-        os.system('rm -rf scetch.zip')
+        order.file = request.FILES['upload']
+        order.save()
         sendmass.delay(order.id, True)
         return redirect(diler_orders)
 
