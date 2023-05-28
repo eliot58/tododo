@@ -22,10 +22,6 @@ from .authentication import *
 from rest_framework import generics, views
 from django.db.models import Q
 
-from django.core.files import File
-from pathlib import Path
-import patoolib
-
 class DilerClass:
     def __init__(self, logo, organization, warehouse_address, region, regions, fullName, email, phone, practice):
         self.logo  = logo
@@ -219,18 +215,8 @@ class OrderView(views.APIView):
             if serializer.is_valid(raise_exception=True):
                 user = request.user
                 order = user.profile.diler.order_set.create(shape=serializer.validated_data['shape'],implement=serializer.validated_data['implement'],address=serializer.validated_data['address'], type_pay=serializer.validated_data['type_pay'], type_delivery=serializer.validated_data['type_delivery'], amount_window=int(serializer.validated_data['amount_window']), price=serializer.validated_data['price'], comment=serializer.validated_data['comment'])
-                files = serializer.validated_data["files"]
-                f = []
-                os.system('rm -rf scetch.zip')
-                for file in files:
-                    f.append(file.temporary_file_path())
-                os.system('rm -rf scetch.zip')
-                patoolib.create_archive('scetch.zip',f)
-                path = Path('scetch.zip')
-                with path.open(mode='rb') as f:
-                    order.file = File(f,name=path.name)
-                    order.save()
-                os.system('rm -rf scetch.zip')
+                order.file = serializer.validated_data['file']
+                order.save()
                 sendmass.delay(order.id, True)
                 return Response(status=HTTP_201_CREATED)
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
