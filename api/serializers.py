@@ -128,11 +128,10 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     shapes_select = ShapeSerializer(many=True, read_only = True)
     implements_select = ImplementSerializer(many=True, read_only = True)
     regions_select = RegionSerializer(many=True, read_only = True)
-    files = serializers.ListField(child=serializers.FileField())
-
+    
     class Meta:
         model = Order
-        fields = ['shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'files', 'shapes_select', 'implements_select', 'regions_select']
+        fields = ['shape', 'implement', 'address', 'type_pay', 'type_delivery', 'amount_window', 'price', 'comment', 'file', 'shapes_select', 'implements_select', 'regions_select']
 
 class QuantitySerializer(serializers.ModelSerializer):
     order = OrderSerializer()
