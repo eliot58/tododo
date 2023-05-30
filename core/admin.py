@@ -143,3 +143,5 @@ class LogAdmin(admin.ModelAdmin):
             return ""
         return "Добавлен " + str(data["added"]) if "added" in data else "Изменен " + str(data["changed"]["fields"])
     
+admin.site.register(DilerComment)
+admin.site.register(ProviderComment)

@@ -103,7 +103,7 @@ class Provider(models.Model):
 
 class DilerComment(models.Model):
     text = models.TextField(verbose_name="Комментарий менеджера")
-    diler = models.ForeignKey(Diler, on_delete=models.DO_NOTHING, null=True, blank=True)
+    diler = models.ForeignKey(Diler, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Комментарий'
@@ -114,7 +114,7 @@ class DilerComment(models.Model):
 
 class ProviderComment(models.Model):
     text = models.TextField(verbose_name="Комментарий менеджера")
-    diler = models.ForeignKey(Provider, on_delete=models.DO_NOTHING, null=True, blank=True)
+    diler = models.ForeignKey(Provider, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Комментарий'
