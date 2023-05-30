@@ -24,6 +24,7 @@ class CommentProviderInline(admin.StackedInline):
 @admin.register(Diler)
 class DilerAdmin(admin.ModelAdmin):
     inlines = [CommentDilerInline]
+    search_fields = ("user__email", )
     list_display = ['user', 'organization', 'warehouse_address', 'region', 'practice', 'last_login', 'date_joined']
 
     @admin.display(ordering='user__user__last_login', description='Дата последнего входа')
@@ -38,6 +39,7 @@ class DilerAdmin(admin.ModelAdmin):
 @admin.register(Provider)
 class ProviderAdmin(admin.ModelAdmin):
     inlines = [CommentProviderInline]
+    search_fields = ("user__email", )
     list_display = ['user', 'company', 'product_address', 'contact_phone', 'service_email', 'last_login', 'date_joined']
 
     @admin.display(ordering='user__user__last_login', description='Дата последнего входа')
