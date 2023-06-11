@@ -22,6 +22,9 @@ from .authentication import *
 from rest_framework import generics, views
 from django.db.models import Q
 
+
+from django.conf import settings
+
 class DilerClass:
     def __init__(self, logo, organization, warehouse_address, region, regions, fullName, email, phone, practice):
         self.logo  = logo
@@ -93,7 +96,8 @@ def signin(request):
         'spec': user.profile.spec
     }, status=HTTP_200_OK)
 
-
+@api_view(["POST"])
+@permission_classes((AllowAny,))
 def tg_signin(request):
     try:
         profile = Profile.objects.get(tg_username=request.data["username"])
