@@ -19,4 +19,5 @@ urlpatterns = [
     path('company/<int:id>/', CompanyView.as_view()),
     path('submit/<int:id>/', submit),
     path('phonesSend/', phonesSend),
+    path('tg-signin/', tg_signin),
 ]

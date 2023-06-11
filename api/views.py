@@ -93,6 +93,21 @@ def signin(request):
         'spec': user.profile.spec
     }, status=HTTP_200_OK)
 
+
+def tg_signin(request):
+    try:
+        profile = Profile.objects.get(tg_username=request.data["username"])
+    except Profile.DoesNotExist:
+        return Response({'detail': 'Does not exist'}, status=HTTP_404_NOT_FOUND)
+    
+    token, _ = Token.objects.get_or_create(user = profile.user)
+
+    return Response({
+        'token': token.key,
+        'spec': profile.spec
+    }, status=HTTP_200_OK)
+    
+
 @api_view(["POST"])
 @permission_classes((AllowAny,))
 def signup(request):

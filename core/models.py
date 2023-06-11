@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 import os
-from simple_history.models import HistoricalRecords
 
 
 class Region(models.Model):
@@ -47,6 +46,7 @@ class Profile(models.Model):
     spec = models.CharField(max_length=9, choices=ch, verbose_name='Спец')
     email = models.EmailField(primary_key=True, verbose_name='Почта')
     phone_number = models.CharField(max_length=20, unique=True, verbose_name='Телефон')
+    tg_username = models.CharField(max_length=60, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Аккаунт'
@@ -64,7 +64,6 @@ class Diler(models.Model):
     region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Регион')
     practice = models.PositiveIntegerField(default=0, verbose_name='Опыт')
     isEmailsubmit = models.BooleanField(default=True)
-    history = HistoricalRecords()
 
 
     def __str__(self):
@@ -91,7 +90,6 @@ class Provider(models.Model):
     logo = models.FileField(upload_to='provider/logo', null=True, blank=True, verbose_name='Логотип')
     description = models.TextField(default='', blank=True, verbose_name='О компании')
     isEmailsubmit = models.BooleanField(default=True)
-    history = HistoricalRecords()
 
     def __str__(self):
         return self.user.fio
@@ -154,7 +152,6 @@ class Order(models.Model):
     date = models.DateField(auto_now_add=True, verbose_name='Дата создания')
     file = models.FileField(upload_to='diler/order/files')
     isactive = models.BooleanField(default=True)
-    history = HistoricalRecords()
 
 
     def __str__(self) -> str:
@@ -182,7 +179,6 @@ class Quantity(models.Model):
     file = models.FileField(upload_to='providers/quantity/files', verbose_name="Файл")
     comment = models.TextField(null=True, verbose_name="Кооментарий")
     isresponse = models.BooleanField(default=False)
-    history = HistoricalRecords()
 
     def __str__(self) -> str:
         return str(self.id)
@@ -200,7 +196,6 @@ class Price(models.Model):
     title = models.CharField(max_length=20)
     price = models.PositiveBigIntegerField()
     description = models.CharField(max_length=50)
-    history = HistoricalRecords()
 
 
     class Meta:
