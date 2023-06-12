@@ -21,6 +21,7 @@ from .authentication import *
 
 from rest_framework import generics, views
 from django.db.models import Q
+from django.db.utils import IntegrityError
 
 
 from django.conf import settings
@@ -129,8 +130,11 @@ def blank_username(request):
     if not user:
         return Response({'detail': 'Invalid Credentials or activate account'}, status=HTTP_404_NOT_FOUND)
     
-    user.profile.tg_username = serializer.data['username'] 
-    user.profile.save()
+    try:
+        user.profile.tg_username = serializer.data['username'] 
+        user.profile.save()
+    except IntegrityError:
+        return Response("Integrity username", status = HTTP_400_BAD_REQUEST)
 
     return Response(status=HTTP_200_OK)
     

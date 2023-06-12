@@ -46,7 +46,7 @@ class Profile(models.Model):
     spec = models.CharField(max_length=9, choices=ch, verbose_name='Спец')
     email = models.EmailField(primary_key=True, verbose_name='Почта')
     phone_number = models.CharField(max_length=20, unique=True, verbose_name='Телефон')
-    tg_username = models.CharField(max_length=60, null=True, blank=True)
+    tg_username = models.CharField(max_length=60, null=True, blank=True, unique=True)
 
     class Meta:
         verbose_name = 'Аккаунт'
