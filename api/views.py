@@ -99,6 +99,9 @@ def signin(request):
 @api_view(["POST"])
 @permission_classes((AllowAny,))
 def tg_signin(request):
+    key = os.getenv("SECRET_KEY")
+    if key != request.data["key"]:
+        return Response(status=HTTP_404_NOT_FOUND)
     try:
         profile = Profile.objects.get(tg_username=request.data["username"])
     except Profile.DoesNotExist:
@@ -110,6 +113,26 @@ def tg_signin(request):
         'token': token.key,
         'spec': profile.spec
     }, status=HTTP_200_OK)
+
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def blank_username(request):
+    serializer = UserNameSerializer(data = request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status = HTTP_400_BAD_REQUEST)
+
+
+    user = authenticate(
+        username = serializer.data['email'],
+        password = serializer.data['password'] 
+    )
+    if not user:
+        return Response({'detail': 'Invalid Credentials or activate account'}, status=HTTP_404_NOT_FOUND)
+    
+    user.profile.tg_username = serializer.data['username'] 
+    user.profile.save()
+
+    return Response(status=HTTP_200_OK)
     
 
 @api_view(["POST"])

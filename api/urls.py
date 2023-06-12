@@ -20,4 +20,5 @@ urlpatterns = [
     path('submit/<int:id>/', submit),
     path('phonesSend/', phonesSend),
     path('tg-signin/', tg_signin),
+    path('blankUsername/', blank_username),
 ]

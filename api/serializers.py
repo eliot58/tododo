@@ -16,6 +16,21 @@ class UserSigninSerializer(serializers.Serializer):
             if not(check_password(data['password'], user.password)):
                 raise serializers.ValidationError('Неверный email или пароль')
         return data
+    
+class UserNameSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+    username = serializers.CharField()
+
+    def validate(self, data):
+        try:
+            user = User.objects.get(username=data['email'])
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Неверный email или пароль')
+        else:
+            if not(check_password(data['password'], user.password)):
+                raise serializers.ValidationError('Неверный email или пароль')
+        return data
 
 class UserSignupSerializer(serializers.Serializer):
     ch = [
