@@ -100,7 +100,7 @@ def signin(request):
 @api_view(["POST"])
 @permission_classes((AllowAny,))
 def tg_signin(request):
-    key = os.getenv("SECRET_KEY")
+    key = os.getenv("key")
     if key != request.data["key"]:
         return Response(status=HTTP_404_NOT_FOUND)
     try:
