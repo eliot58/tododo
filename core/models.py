@@ -134,7 +134,7 @@ class Order(models.Model):
     user = models.ForeignKey(Diler, on_delete=models.CASCADE, verbose_name='Автор заказа')
     shape = models.ForeignKey(Shape, on_delete=models.CASCADE, verbose_name='Профиль')
     implement = models.ForeignKey(Implement, on_delete=models.CASCADE, verbose_name='Фурнитура')
-    address = models.CharField(max_length=50, verbose_name='Адрес')
+    address = models.CharField(max_length=200, verbose_name='Адрес')
     pay_ch = [
         ('C', 'Карта'),
         ('N', 'Безнал')
