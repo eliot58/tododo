@@ -160,7 +160,7 @@ class QuantitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Quantity
-        fields = '__all__'
+        fields = ["author", "author_id", "order", "date_create", "date", "shape", "implement", "price", "file", "comment", "isresponse"]
 
 class CreateQuantitySerializer(serializers.ModelSerializer):
 
