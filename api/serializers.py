@@ -103,6 +103,9 @@ class ProviderSerialiazer(serializers.ModelSerializer):
     shapes_select = ShapeSerializer(many=True, read_only = True)
     implements_select = ImplementSerializer(many=True, read_only = True)
     regions_select = RegionSerializer(many=True, read_only = True)
+    shapes = serializers.SlugRelatedField(slug_field='data', read_only = True, many=True)
+    implements = serializers.SlugRelatedField(slug_field='data', read_only = True, many = True)
+    regions = serializers.SlugRelatedField(slug_field='data', read_only = True, many = True)
 
     def update(self, instance, validated_data):
         instance.company = validated_data.get('company', instance.company)

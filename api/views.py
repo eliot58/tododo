@@ -352,8 +352,6 @@ class PriceList(generics.ListAPIView):
 
 class CompanyView(views.APIView):
     def get(self, request, *args, **kwargs):
-        if request.user.profile.spec == 'D':
-            return Response(status=HTTP_403_FORBIDDEN)
         company_serializer = ProviderSerialiazer(Provider.objects.get(id=kwargs["id"]))
-        reviews_serializer = ReviewSerializer(Review.objects.filter(to_id=kwargs["id"]))
+        reviews_serializer = ReviewSerializer(Review.objects.filter(to_id=kwargs["id"]), many=True)
         return Response(data={'company': company_serializer.data, 'reviews': reviews_serializer.data})
